@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.*
 import com.example.exertion.data.workout.WORKOUT
-import com.example.exertion.data.exercise.EXERCISE
+import com.example.exertion.data.exercise.ExerciseTable
 
 @Entity(
     tableName = "WORKOUT_EXERCISE",
@@ -19,7 +19,7 @@ import com.example.exertion.data.exercise.EXERCISE
         ),
         // EXERCISE.exercise_id < WORKOUT_EXERCISE.exercise_id [delete: restrict]
         ForeignKey(
-            entity = EXERCISE::class,
+            entity = ExerciseTable::class,
             parentColumns = ["exercise_id"],
             childColumns = ["exercise_id"],
             onDelete = ForeignKey.RESTRICT

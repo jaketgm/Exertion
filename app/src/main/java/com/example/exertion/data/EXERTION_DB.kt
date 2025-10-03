@@ -5,13 +5,19 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.exertion.data.daily_user_metric_snapshot.DAILY_USER_METRIC_SNAPSHOT_DAO
-import com.example.exertion.data.exercise.EXERCISE_DAO
-import com.example.exertion.data.exercise_metric_snapshot.EXERCISE_METRIC_SNAPSHOT_DAO
-import com.example.exertion.data.personal_analytics.PERSONAL_ANALYTICS
-import com.example.exertion.data.personal_analytics.PERSONAL_ANALYTICS_DAO
-import com.example.exertion.data.rep_entry.REP_ENTRY_DAO
-import com.example.exertion.data.set_entry.SET_ENTRY_DAO
+import com.example.exertion.data.daily_user_metric_snapshot.read_dao.DailyUserMetricSnapshotReadDao
+import com.example.exertion.data.daily_user_metric_snapshot.write_dao.DailyUserMetricSnapshotWriteDao
+import com.example.exertion.data.exercise.read_dao.ExerciseReadDao
+import com.example.exertion.data.exercise.write_dao.ExerciseWriteDao
+import com.example.exertion.data.exercise_metric_snapshot.read_dao.ExerciseMetricSnapshotReadDao
+import com.example.exertion.data.exercise_metric_snapshot.write_dao.ExerciseMetricSnapshotWriteDao
+import com.example.exertion.data.personal_analytics.PersonalAnalytics
+import com.example.exertion.data.personal_analytics.read_dao.PersonalAnalyticsReadDao
+import com.example.exertion.data.personal_analytics.write_dao.PersonalAnalyticsWriteDao
+import com.example.exertion.data.rep_entry.read_dao.RepEntryReadDao
+import com.example.exertion.data.rep_entry.write_dao.RepEntryWriteDao
+import com.example.exertion.data.set_entry.read_dao.SetEntryReadDao
+import com.example.exertion.data.set_entry.write_dao.SetEntryWriteDao
 import com.example.exertion.data.user_table.read_dao.UserReadDao
 import com.example.exertion.data.user_table.UserTable
 import com.example.exertion.data.user_table.write_dao.UserWriteDao
@@ -20,7 +26,7 @@ import com.example.exertion.data.workout_exercise.WORKOUT_EXERCISE_DAO
 import com.example.exertion.data.workout_metric_snapshot.WORKOUT_METRIC_SNAPSHOT_DAO
 
 @Database(
-    entities = [UserTable::class, PERSONAL_ANALYTICS::class],
+    entities = [UserTable::class, PersonalAnalytics::class],
     version = 1,
     exportSchema = true
 )
@@ -28,15 +34,21 @@ import com.example.exertion.data.workout_metric_snapshot.WORKOUT_METRIC_SNAPSHOT
 abstract class EXERTION_DB: RoomDatabase() {
     abstract fun userReadDao(): UserReadDao
     abstract fun userWriteDao(): UserWriteDao
-    abstract fun personalAnalyticsDao(): PERSONAL_ANALYTICS_DAO
-    abstract fun exerciseDao(): EXERCISE_DAO
+    abstract fun personalAnalyticsReadDao(): PersonalAnalyticsReadDao
+    abstract fun personalAnalyticsWriteDao(): PersonalAnalyticsWriteDao
+    abstract fun exerciseReadDao(): ExerciseReadDao
+    abstract fun exerciseWriteDao(): ExerciseWriteDao
     abstract fun workoutDao(): WORKOUT_DAO
     abstract fun workoutExerciseDao(): WORKOUT_EXERCISE_DAO
-    abstract fun setEntryDao(): SET_ENTRY_DAO
-    abstract fun repEntryDao(): REP_ENTRY_DAO
+    abstract fun setEntryReadDao(): SetEntryReadDao
+    abstract fun setEntryWriteDao(): SetEntryWriteDao
+    abstract fun repEntryReadDao(): RepEntryReadDao
+    abstract fun repEntryWriteDao(): RepEntryWriteDao
     abstract fun workoutMetricSnapshotDao(): WORKOUT_METRIC_SNAPSHOT_DAO
-    abstract fun dailyUserMetricSnapshotDao(): DAILY_USER_METRIC_SNAPSHOT_DAO
-    abstract fun exerciseMetricSnapshotDao(): EXERCISE_METRIC_SNAPSHOT_DAO
+    abstract fun dailyUserMetricSnapshotReadDao(): DailyUserMetricSnapshotReadDao
+    abstract fun dailyUserMetricSnapshotWriteDao(): DailyUserMetricSnapshotWriteDao
+    abstract fun exerciseMetricSnapshotReadDao(): ExerciseMetricSnapshotReadDao
+    abstract fun exerciseMetricSnapshotWriteDao(): ExerciseMetricSnapshotWriteDao
 
     companion object {
         // writes are visible to other threads
