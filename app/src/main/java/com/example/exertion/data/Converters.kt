@@ -6,7 +6,7 @@ enum class Gender {
     MALE, FEMALE, OTHER
 }
 
-class CONVERTERS {
+class Converters {
     @TypeConverter fun fromGender(value: Gender?): String? = value?.name
     @TypeConverter fun toGender(value: String?): Gender? = value?.let { Gender.valueOf(it) }
 }

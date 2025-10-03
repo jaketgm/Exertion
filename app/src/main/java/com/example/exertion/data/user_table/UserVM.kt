@@ -2,7 +2,7 @@ package com.example.exertion.data.user_table
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.exertion.data.EXERTION_DB
+import com.example.exertion.data.ExertionDB
 import kotlinx.coroutines.flow.Flow
 
 class UserVM(application: Application): AndroidViewModel(application) {
@@ -10,7 +10,7 @@ class UserVM(application: Application): AndroidViewModel(application) {
     private val repository: UserRepo
 
     init {
-        val db = EXERTION_DB.getDatabase(application)
+        val db = ExertionDB.getDatabase(application)
         val userReadDao = db.userReadDao()
         val userWriteDao = db.userWriteDao()
         repository = UserRepo(userReadDao, userWriteDao)

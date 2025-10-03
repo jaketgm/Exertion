@@ -20,7 +20,7 @@ import com.example.exertion.data.user_table.UserTable
         Index(value = ["user_id", "started_at"], unique = true) // candidate key
     ]
 )
-data class WORKOUT(
+data class Workout(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "workout_id")
     val workout_id: Int = 0,

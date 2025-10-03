@@ -21,30 +21,36 @@ import com.example.exertion.data.set_entry.write_dao.SetEntryWriteDao
 import com.example.exertion.data.user_table.read_dao.UserReadDao
 import com.example.exertion.data.user_table.UserTable
 import com.example.exertion.data.user_table.write_dao.UserWriteDao
-import com.example.exertion.data.workout.WORKOUT_DAO
-import com.example.exertion.data.workout_exercise.WORKOUT_EXERCISE_DAO
-import com.example.exertion.data.workout_metric_snapshot.WORKOUT_METRIC_SNAPSHOT_DAO
+import com.example.exertion.data.workout.read_dao.WorkoutReadDao
+import com.example.exertion.data.workout.write_dao.WorkoutWriteDao
+import com.example.exertion.data.workout_exercise.read_dao.WorkoutExerciseReadDao
+import com.example.exertion.data.workout_exercise.write_dao.WorkoutExerciseWriteDao
+import com.example.exertion.data.workout_metric_snapshot.read_dao.WorkoutMetricSnapshotReadDao
+import com.example.exertion.data.workout_metric_snapshot.write_dao.WorkoutMetricSnapshotWriteDao
 
 @Database(
     entities = [UserTable::class, PersonalAnalytics::class],
     version = 1,
     exportSchema = true
 )
-@TypeConverters(CONVERTERS::class)
-abstract class EXERTION_DB: RoomDatabase() {
+@TypeConverters(Converters::class)
+abstract class ExertionDB: RoomDatabase() {
     abstract fun userReadDao(): UserReadDao
     abstract fun userWriteDao(): UserWriteDao
     abstract fun personalAnalyticsReadDao(): PersonalAnalyticsReadDao
     abstract fun personalAnalyticsWriteDao(): PersonalAnalyticsWriteDao
     abstract fun exerciseReadDao(): ExerciseReadDao
     abstract fun exerciseWriteDao(): ExerciseWriteDao
-    abstract fun workoutDao(): WORKOUT_DAO
-    abstract fun workoutExerciseDao(): WORKOUT_EXERCISE_DAO
+    abstract fun workoutReadDao(): WorkoutReadDao
+    abstract fun workoutWriteDao(): WorkoutWriteDao
+    abstract fun workoutExerciseReadDao(): WorkoutExerciseReadDao
+    abstract fun workoutExerciseWriteDao(): WorkoutExerciseWriteDao
     abstract fun setEntryReadDao(): SetEntryReadDao
     abstract fun setEntryWriteDao(): SetEntryWriteDao
     abstract fun repEntryReadDao(): RepEntryReadDao
     abstract fun repEntryWriteDao(): RepEntryWriteDao
-    abstract fun workoutMetricSnapshotDao(): WORKOUT_METRIC_SNAPSHOT_DAO
+    abstract fun workoutMetricSnapshotReadDao(): WorkoutMetricSnapshotReadDao
+    abstract fun workoutMetricSnapshotWriteDao(): WorkoutMetricSnapshotWriteDao
     abstract fun dailyUserMetricSnapshotReadDao(): DailyUserMetricSnapshotReadDao
     abstract fun dailyUserMetricSnapshotWriteDao(): DailyUserMetricSnapshotWriteDao
     abstract fun exerciseMetricSnapshotReadDao(): ExerciseMetricSnapshotReadDao
@@ -53,9 +59,9 @@ abstract class EXERTION_DB: RoomDatabase() {
     companion object {
         // writes are visible to other threads
         @Volatile
-        private var INSTANCE: EXERTION_DB? = null // singleton class
+        private var INSTANCE: ExertionDB? = null // singleton class
 
-        fun getDatabase(context: Context): EXERTION_DB {
+        fun getDatabase(context: Context): ExertionDB {
             val temp_instance = INSTANCE
             if (temp_instance != null) {
                 return temp_instance
@@ -64,7 +70,7 @@ abstract class EXERTION_DB: RoomDatabase() {
             synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    EXERTION_DB::class.java,
+                    ExertionDB::class.java,
                     "exertion_database"
                 ).build()
                 INSTANCE = instance

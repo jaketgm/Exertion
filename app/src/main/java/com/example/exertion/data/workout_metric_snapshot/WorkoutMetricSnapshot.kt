@@ -4,14 +4,14 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.*
-import com.example.exertion.data.workout.WORKOUT
 import com.example.exertion.data.user_table.UserTable
+import com.example.exertion.data.workout.Workout
 
 @Entity(
     tableName = "WORKOUT_METRIC_SNAPSHOT",
     foreignKeys = [
         ForeignKey(
-            entity = WORKOUT::class,
+            entity = Workout::class,
             parentColumns = ["workout_id"],
             childColumns = ["workout_id"],
             onDelete = ForeignKey.CASCADE
@@ -29,7 +29,7 @@ import com.example.exertion.data.user_table.UserTable
         Index(value = ["is_stale"])
     ]
 )
-data class WORKOUT_METRIC_SNAPSHOT(
+data class WorkoutMetricSnapshot(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "snapshot_id")
     val snapshot_id: Int = 0,

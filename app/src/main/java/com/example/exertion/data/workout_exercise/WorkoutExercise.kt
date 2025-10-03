@@ -4,15 +4,15 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.*
-import com.example.exertion.data.workout.WORKOUT
 import com.example.exertion.data.exercise.ExerciseTable
+import com.example.exertion.data.workout.Workout
 
 @Entity(
-    tableName = "WORKOUT_EXERCISE",
+    tableName = "workout_exercise",
     foreignKeys = [
         // WORKOUT.workout_id < WORKOUT_EXERCISE.workout_id [delete: cascade]
         ForeignKey(
-            entity = WORKOUT::class,
+            entity = Workout::class,
             parentColumns = ["workout_id"],
             childColumns = ["workout_id"],
             onDelete = ForeignKey.CASCADE
@@ -34,7 +34,7 @@ import com.example.exertion.data.exercise.ExerciseTable
         Index(value = ["exercise_id"])
     ]
 )
-data class WORKOUT_EXERCISE(
+data class WorkoutExercise(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "workout_exercise_id")
     val workout_exercise_id: Int = 0,
