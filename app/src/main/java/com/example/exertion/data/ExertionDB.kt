@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.exertion.data.daily_user_metric_snapshot.DailyUserMetricSnapshot
 import com.example.exertion.data.daily_user_metric_snapshot.read_dao.DailyUserMetricSnapshotReadDao
 import com.example.exertion.data.daily_user_metric_snapshot.write_dao.DailyUserMetricSnapshotWriteDao
 import com.example.exertion.data.exercise.read_dao.ExerciseReadDao
@@ -20,16 +21,23 @@ import com.example.exertion.data.set_entry.read_dao.SetEntryReadDao
 import com.example.exertion.data.set_entry.write_dao.SetEntryWriteDao
 import com.example.exertion.data.user_table.read_dao.UserReadDao
 import com.example.exertion.data.user_table.UserTable
+import com.example.exertion.data.exercise.ExerciseTable
+import com.example.exertion.data.exercise_metric_snapshot.ExerciseMetricSnapshot
+import com.example.exertion.data.rep_entry.RepEntry
+import com.example.exertion.data.set_entry.SetEntry
 import com.example.exertion.data.user_table.write_dao.UserWriteDao
+import com.example.exertion.data.workout.Workout
 import com.example.exertion.data.workout.read_dao.WorkoutReadDao
 import com.example.exertion.data.workout.write_dao.WorkoutWriteDao
+import com.example.exertion.data.workout_exercise.WorkoutExercise
 import com.example.exertion.data.workout_exercise.read_dao.WorkoutExerciseReadDao
 import com.example.exertion.data.workout_exercise.write_dao.WorkoutExerciseWriteDao
+import com.example.exertion.data.workout_metric_snapshot.WorkoutMetricSnapshot
 import com.example.exertion.data.workout_metric_snapshot.read_dao.WorkoutMetricSnapshotReadDao
 import com.example.exertion.data.workout_metric_snapshot.write_dao.WorkoutMetricSnapshotWriteDao
 
 @Database(
-    entities = [UserTable::class, PersonalAnalytics::class],
+    entities = [UserTable::class, PersonalAnalytics::class, DailyUserMetricSnapshot::class, ExerciseTable::class, ExerciseMetricSnapshot::class, RepEntry::class, SetEntry::class, Workout::class, WorkoutExercise::class, WorkoutMetricSnapshot::class],
     version = 1,
     exportSchema = true
 )

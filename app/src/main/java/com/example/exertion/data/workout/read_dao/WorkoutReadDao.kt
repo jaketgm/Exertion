@@ -5,7 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.exertion.data.workout.WORKOUT
+import com.example.exertion.data.workout.Workout
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -13,5 +13,5 @@ interface WorkoutReadDao {
     @Query(
         "SELECT * FROM WORKOUT ORDER BY workout_id ASC"
     )
-    fun readAllWorkoutData(): Flow<List<WORKOUT>>
+    fun readAllWorkoutData(): Flow<List<Workout>>
 }

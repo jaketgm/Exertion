@@ -4,13 +4,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.*
-import com.example.exertion.data.workout_exercise.WORKOUT_EXERCISE
+import com.example.exertion.data.workout_exercise.WorkoutExercise
 
 @Entity(
     tableName = "set_entry",
     foreignKeys = [
         ForeignKey(
-            entity = WORKOUT_EXERCISE::class,
+            entity = WorkoutExercise::class,
             parentColumns = ["workout_exercise_id"],
             childColumns = ["workout_exercise_id"],
             onDelete = ForeignKey.CASCADE

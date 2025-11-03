@@ -13,7 +13,7 @@ interface ExerciseReadDao {
     suspend fun addExercise(exerciseTable: ExerciseTable)
 
     @Query(
-        "SELECT * FROM EXERCISE ORDER BY exercise_id ASC"
+        "SELECT * FROM exercise ORDER BY exercise_id ASC"
     )
     fun readAllExerciseData(): Flow<List<ExerciseTable>>
 }
