@@ -1,4 +1,4 @@
-package com.example.exertion.ui_components
+package com.example.exertion.ui_components.navbar
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -6,16 +6,13 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Modifier.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -70,13 +66,13 @@ fun NavBar(
     // Gradients
     val dark_gradient = Brush.radialGradient(
         colors = listOf(Color(0x66000000), Color(0x1A723333)),
-        center = androidx.compose.ui.geometry.Offset(0f, 0f),
+        center = Offset(0f, 0f),
         radius = 800f
     )
 
     val light_gradient = Brush.radialGradient(
         colors = listOf(Color(0xFFFF8080), Color(0x99FF5959)),
-        center = androidx.compose.ui.geometry.Offset(0f, 0f),
+        center = Offset(0f, 0f),
         radius = 900f
     )
 

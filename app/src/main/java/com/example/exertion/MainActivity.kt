@@ -69,9 +69,7 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        TextFieldCustom()
-                        Spacer(modifier = Modifier.height(16.dp))
-                        PasswordField()
+
                     }
                 }
             }

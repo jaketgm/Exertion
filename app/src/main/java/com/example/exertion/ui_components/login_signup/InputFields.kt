@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,12 +15,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -42,10 +43,10 @@ fun GradientInputField(
     inputType: KeyboardType,
     modifier: Modifier = Modifier,
     showTrailingIcon: Boolean = false,
-    trailingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: (@Composable (() -> Unit))? = null,
     isPasswordField: Boolean = false
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by rememberSaveable { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     val backgroundBrush = Brush.linearGradient(
@@ -74,8 +75,10 @@ fun GradientInputField(
             painter = painterResource(id = R.drawable.noise_pattern),
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
-            alpha = 0.08f, // subtle, tweak to taste
-            modifier = Modifier.matchParentSize().clip(RoundedCornerShape(16.dp))
+            alpha = 0.08f,
+            modifier = Modifier
+                .matchParentSize()
+                .clip(RoundedCornerShape(16.dp))
         )
 
         Row(
@@ -87,10 +90,10 @@ fun GradientInputField(
                 painter = painterResource(id = icon),
                 contentDescription = label,
                 tint = Color.White,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier
+                    .size(32.dp)
+                    .padding(end = 8.dp)
             )
-
-            Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -102,9 +105,12 @@ fun GradientInputField(
 
                 OutlinedTextField(
                     value = text,
-                    onValueChange = { value -> text = value },
+                    onValueChange = { text = it },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                        .focusable(true),
                     textStyle = TextStyle(color = Color.White),
                     placeholder = {
                         Text(
@@ -125,10 +131,12 @@ fun GradientInputField(
                         cursorColor = Color.White
                     ),
                     trailingIcon = {
-                        if (showTrailingIcon) {
-                            if (trailingIcon != null) {
-                                trailingIcon()
-                            } else if (isPasswordField) {
+                        // FIXED composable control flow
+                        when {
+                            showTrailingIcon && trailingIcon != null -> {
+                                trailingIcon.invoke()
+                            }
+                            isPasswordField -> {
                                 val visibilityIcon = if (passwordVisible)
                                     R.drawable.visibility_on else R.drawable.visibility_off
                                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
