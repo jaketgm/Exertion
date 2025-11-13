@@ -62,6 +62,7 @@ dependencies {
     // Room (use KSP)
     implementation("androidx.room:room-runtime:2.8.1")
     implementation("androidx.room:room-ktx:2.8.1")
+    implementation(libs.androidx.compose.ui.text)
     ksp("androidx.room:room-compiler:2.8.1")
     androidTestImplementation("androidx.room:room-testing:2.8.1")
 
@@ -72,6 +73,8 @@ dependencies {
     // Coroutines (current)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+
+    implementation(libs.androidx.datastore)
 
     // Tests / tooling
     testImplementation(libs.junit)

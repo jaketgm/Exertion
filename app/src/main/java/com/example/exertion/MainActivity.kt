@@ -1,10 +1,12 @@
 package com.example.exertion
 
 import android.graphics.Paint
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +27,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.mutableStateOf
@@ -48,49 +51,84 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.trace
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import com.example.exertion.data.datastore.UserPreferencesDataStore
+import com.example.exertion.data.user_table.UserVM
+import com.example.exertion.screens.HomeScreen
 import com.example.exertion.ui.theme.BLACK_COLOR
 import com.example.exertion.ui.theme.EXERTION_RED
 import com.example.exertion.ui.theme.DARK_GREY
 import com.example.exertion.ui.theme.ExertionTheme
 import com.example.exertion.ui.theme.Typography
+import kotlinx.coroutines.coroutineScope
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ExertionTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize()
-                    .border(2.dp, Color.Magenta),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
 
-                    }
+                val navController = rememberNavController()
+                val userVM: UserVM = viewModel()
+
+                val userPrefs = UserPreferencesDataStore(this)
+
+                // 1. Observe logged-in userId
+                val userId by userPrefs.userIdFlow.collectAsState(initial = null)
+
+                if (userId == null) {
+                    // User not logged in → show login screen
+                    LoginScreen(
+                        onLoginSuccess = { uid ->
+                            // save new id to DataStore
+                            coroutineScope.launch {
+                                userPrefs.setLoggedInUserId(uid)
+                            }
+                        }
+                    )
+                    return@ExertionTheme
+                }
+
+                // 2. Load user from Room
+                val currentUser by userVM.observeUser(userId!!)
+                    .collectAsState(initial = null)
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color.Transparent
+                ) {
+                    HomeScreen(
+                        navController = navController,
+                        userName = currentUser?.username ?: "Loading...",
+                        isDarkMode = true,
+                        onProfileClick = {}
+                    )
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = false, backgroundColor = 0xFF000000)
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     ExertionTheme {
+        val navController = rememberNavController()
         Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color.White
+            modifier = Modifier
+                .fillMaxSize()
+                .border(2.dp, Color.Magenta),
+            color = Color.Transparent
         ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-            }
+            HomeScreen(
+                navController = navController,
+                userName = "Jake",
+                isDarkMode = true,
+                onProfileClick = {}
+            )
         }
     }
 }

@@ -20,4 +20,8 @@ class UserVM(application: Application): AndroidViewModel(application) {
     fun observeUser(id: Int): Flow<UserTable?> = repository.observeUser(id)
 
     suspend fun upsertUser(user: UserTable) = repository.upsertUser(user)
+
+    suspend fun getUserByEmailOrUsername(identifier: String): UserTable? {
+        return repository.getUserByEmailOrUsername(identifier)
+    }
 }

@@ -41,6 +41,8 @@ fun GradientInputField(
     placeholder: String,
     icon: Int,
     inputType: KeyboardType,
+    text: String,
+    onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     showTrailingIcon: Boolean = false,
     trailingIcon: (@Composable (() -> Unit))? = null,
@@ -165,39 +167,6 @@ fun InputFieldsPreview() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        GradientInputField(
-            label = "User Name / Email",
-            placeholder = "sample918",
-            icon = R.drawable.ic_profile_placeholder,
-            inputType = KeyboardType.Text
-        )
 
-        GradientInputField(
-            label = "Password",
-            placeholder = "************",
-            icon = R.drawable.ic_lock,
-            inputType = KeyboardType.Password,
-            isPasswordField = true,
-            showTrailingIcon = true
-        )
-
-        GradientInputField(
-            label = "Email",
-            placeholder = "sample@gmail.com",
-            icon = R.drawable.ic_email,
-            inputType = KeyboardType.Email,
-            showTrailingIcon = true,
-            trailingIcon = {
-                Box(
-                    modifier = Modifier
-                        .border(BorderStroke(1.dp, Color.White), RoundedCornerShape(50))
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                        .clickable { /* handle sign-up */ },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Sign Up", color = Color.White, fontSize = 14.sp, textAlign = TextAlign.Center)
-                }
-            }
-        )
     }
 }

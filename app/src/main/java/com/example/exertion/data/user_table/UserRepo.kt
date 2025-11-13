@@ -13,6 +13,17 @@ class UserRepo(
 
     fun observeUser(id: Int): Flow<UserTable?> =
         userReadDao.observeUser(id)
+
+    suspend fun getUserByEmail(email: String): UserTable? =
+        userReadDao.getUserByEmail(email)
+
+    suspend fun getUserByUsername(username: String): UserTable? =
+        userReadDao.getUserByUsername(username)
+
+    suspend fun getUserByEmailOrUsername(identifier: String): UserTable? {
+        return userReadDao.getUserByEmail(identifier)
+            ?: userReadDao.getUserByUsername(identifier)
+    }
     suspend fun upsertUser(user: UserTable) {
         userWriteDao.upsertUser(user)
     }
