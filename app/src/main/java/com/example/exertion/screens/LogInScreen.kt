@@ -169,10 +169,9 @@ fun LoginScreen(
                     }
 
                     if (tab == "register") {
-                        Text(
-                            text = "Registration coming soon",
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 14.sp
+                        RegisterScreen(
+                            userVM = userVM!!,
+                            onRegisterSuccess = onLoginSuccess
                         )
                     }
                 }

@@ -41,20 +41,19 @@ fun GradientInputField(
     placeholder: String,
     icon: Int,
     inputType: KeyboardType,
-    text: String,
-    onTextChange: (String) -> Unit,
+    text: String,                         // controlled input value
+    onTextChange: (String) -> Unit,        // controlled state callback
     modifier: Modifier = Modifier,
     showTrailingIcon: Boolean = false,
     trailingIcon: (@Composable (() -> Unit))? = null,
     isPasswordField: Boolean = false
 ) {
-    var text by rememberSaveable { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     val backgroundBrush = Brush.linearGradient(
         colors = listOf(
-            Color(0xC2C20E35), // #C20E35 @ 80%
-            Color(0xFFBC8F8F)  // #BC8F8F
+            Color(0xC2C20E35),
+            Color(0xFFBC8F8F)
         ),
         start = Offset(0f, 0f),
         end = Offset(400f, 400f)
@@ -85,7 +84,6 @@ fun GradientInputField(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
             modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
@@ -107,7 +105,7 @@ fun GradientInputField(
 
                 OutlinedTextField(
                     value = text,
-                    onValueChange = { text = it },
+                    onValueChange = { onTextChange(it) },   // <-- correct
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -133,18 +131,18 @@ fun GradientInputField(
                         cursorColor = Color.White
                     ),
                     trailingIcon = {
-                        // FIXED composable control flow
                         when {
-                            showTrailingIcon && trailingIcon != null -> {
-                                trailingIcon.invoke()
-                            }
+                            showTrailingIcon && trailingIcon != null -> trailingIcon()
                             isPasswordField -> {
                                 val visibilityIcon = if (passwordVisible)
                                     R.drawable.visibility_on else R.drawable.visibility_off
-                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+
+                                IconButton(onClick = {
+                                    passwordVisible = !passwordVisible
+                                }) {
                                     Icon(
                                         painter = painterResource(id = visibilityIcon),
-                                        contentDescription = "Toggle password visibility",
+                                        contentDescription = null,
                                         tint = Color.White
                                     )
                                 }

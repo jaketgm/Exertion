@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -56,12 +57,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.exertion.data.datastore.UserPreferencesDataStore
 import com.example.exertion.data.user_table.UserVM
 import com.example.exertion.screens.HomeScreen
+import com.example.exertion.screens.LoginScreen
 import com.example.exertion.ui.theme.BLACK_COLOR
 import com.example.exertion.ui.theme.EXERTION_RED
 import com.example.exertion.ui.theme.DARK_GREY
 import com.example.exertion.ui.theme.ExertionTheme
 import com.example.exertion.ui.theme.Typography
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -72,18 +75,17 @@ class MainActivity : ComponentActivity() {
 
                 val navController = rememberNavController()
                 val userVM: UserVM = viewModel()
-
                 val userPrefs = UserPreferencesDataStore(this)
+                val scope = rememberCoroutineScope()
 
-                // 1. Observe logged-in userId
                 val userId by userPrefs.userIdFlow.collectAsState(initial = null)
 
                 if (userId == null) {
-                    // User not logged in → show login screen
                     LoginScreen(
+                        navController = navController,
+                        userVM = userVM,
                         onLoginSuccess = { uid ->
-                            // save new id to DataStore
-                            coroutineScope.launch {
+                            scope.launch {
                                 userPrefs.setLoggedInUserId(uid)
                             }
                         }
@@ -91,7 +93,6 @@ class MainActivity : ComponentActivity() {
                     return@ExertionTheme
                 }
 
-                // 2. Load user from Room
                 val currentUser by userVM.observeUser(userId!!)
                     .collectAsState(initial = null)
 

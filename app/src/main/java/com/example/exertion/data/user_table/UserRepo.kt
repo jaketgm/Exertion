@@ -24,7 +24,7 @@ class UserRepo(
         return userReadDao.getUserByEmail(identifier)
             ?: userReadDao.getUserByUsername(identifier)
     }
-    suspend fun upsertUser(user: UserTable) {
-        userWriteDao.upsertUser(user)
+    suspend fun upsertUser(user: UserTable): Long {
+        return userWriteDao.upsertUser(user)
     }
 }
