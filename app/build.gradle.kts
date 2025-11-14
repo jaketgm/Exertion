@@ -63,6 +63,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.8.1")
     implementation("androidx.room:room-ktx:2.8.1")
     implementation(libs.androidx.compose.ui.text)
+    implementation(libs.androidx.compose.foundation)
     ksp("androidx.room:room-compiler:2.8.1")
     androidTestImplementation("androidx.room:room-testing:2.8.1")
 
