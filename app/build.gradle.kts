@@ -37,6 +37,7 @@ android {
     }
     buildFeatures {
         compose = true
+        mlModelBinding = true
     }
 }
 
@@ -64,6 +65,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.8.1")
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.media3.common.ktx)
     ksp("androidx.room:room-compiler:2.8.1")
     androidTestImplementation("androidx.room:room-testing:2.8.1")
 
@@ -76,6 +78,21 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     implementation(libs.androidx.datastore)
+
+    implementation(libs.accompanist.permissions)
+    // Camera
+    implementation(libs.bundles.camerax.core)
+
+    implementation(libs.tensorflow.lite)
+    implementation(libs.tensorflow.lite.support)
+    implementation(libs.tensorflow.lite.metadata)
+    implementation(libs.tensorflow.lite.gpu)
+
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
+    implementation(libs.media3.common)
+
+    implementation(libs.coil.compose)
 
     // Tests / tooling
     testImplementation(libs.junit)
