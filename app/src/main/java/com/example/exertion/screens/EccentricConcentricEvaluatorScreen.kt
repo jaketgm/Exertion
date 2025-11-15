@@ -35,6 +35,8 @@ import androidx.media3.common.util.Log
 import androidx.media3.datasource.DataSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
+import com.example.exertion.ui_components.topbar.StableTopBar
+import com.example.exertion.utils.camera.ObjectRecognitionAnalyzer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
