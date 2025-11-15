@@ -17,6 +17,9 @@
       <SelectionState runConfigName="EccentricConcentricButtonPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="PreviewEccentricConcentricEvaluatorScreen">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>
