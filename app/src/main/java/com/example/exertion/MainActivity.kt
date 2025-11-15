@@ -53,9 +53,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.trace
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.exertion.data.datastore.UserPreferencesDataStore
 import com.example.exertion.data.user_table.UserVM
+import com.example.exertion.screens.EccentricConcentricEvaluatorScreen
 import com.example.exertion.screens.HomeScreen
 import com.example.exertion.screens.LoginScreen
 import com.example.exertion.ui.theme.BLACK_COLOR
@@ -65,6 +67,8 @@ import com.example.exertion.ui.theme.ExertionTheme
 import com.example.exertion.ui.theme.Typography
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import androidx.navigation.compose.composable
+import com.example.exertion.utils.camera.CameraPermissionGate
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -80,14 +84,13 @@ class MainActivity : ComponentActivity() {
 
                 val userId by userPrefs.userIdFlow.collectAsState(initial = null)
 
+                // 1. LOGIN GATE   -------------------------------------------------------
                 if (userId == null) {
                     LoginScreen(
                         navController = navController,
                         userVM = userVM,
                         onLoginSuccess = { uid ->
-                            scope.launch {
-                                userPrefs.setLoggedInUserId(uid)
-                            }
+                            scope.launch { userPrefs.setLoggedInUserId(uid) }
                         }
                     )
                     return@ExertionTheme
@@ -96,16 +99,33 @@ class MainActivity : ComponentActivity() {
                 val currentUser by userVM.observeUser(userId!!)
                     .collectAsState(initial = null)
 
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = Color.Transparent
+                // 2. MAIN APP ROUTER (NavHost)  -----------------------------------------
+                NavHost(
+                    navController = navController,
+                    startDestination = "home"
                 ) {
-                    HomeScreen(
-                        navController = navController,
-                        userName = currentUser?.username ?: "Loading...",
-                        isDarkMode = true,
-                        onProfileClick = {}
-                    )
+                    composable("home") {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = Color.Transparent
+                        ) {
+                            HomeScreen(
+                                navController = navController,
+                                userName = currentUser?.username ?: "Loading...",
+                                isDarkMode = true,
+                                onProfileClick = {}
+                            )
+                        }
+                    }
+
+                    composable("eccentric_concentric") {
+                        CameraPermissionGate {
+                            EccentricConcentricEvaluatorScreen(
+                                navController = navController,
+                                exerciseName = "Bench Press"
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -215,7 +216,11 @@ fun HomeScreen(
                     SquareCard(
                         header = "Eccentric\nConcentric",
                         bodyText = "Default: Bench Press",
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable {
+                                navController?.navigate("eccentric_concentric")
+                            }
                     )
                 }
 
