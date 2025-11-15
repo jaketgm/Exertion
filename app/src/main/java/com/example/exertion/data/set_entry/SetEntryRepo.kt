@@ -11,7 +11,7 @@ class SetEntryRepo(
 ) {
     fun readAllSetEntryData(): Flow<List<SetEntry>> = setEntryReadDao.readAllSetEntryData()
 
-    suspend fun addSetEntry(setEntry: SetEntry) {
-        setEntryWriteDao.addSetEntry(setEntry)
+    suspend fun addSetEntryReturningId(setEntry: SetEntry): Long {
+        return setEntryWriteDao.addSetEntry(setEntry)
     }
 }

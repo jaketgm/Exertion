@@ -17,7 +17,7 @@ class SetEntryVM(application: Application): AndroidViewModel(application) {
         read_all_setEntry_data = set_entry_repository.readAllSetEntryData()
     }
 
-    suspend fun addSetEntry(setEntry: SetEntry) {
-        set_entry_repository.addSetEntry(setEntry)
+    suspend fun addSetEntryReturningId(setEntry: SetEntry): Int {
+        return set_entry_repository.addSetEntryReturningId(setEntry).toInt()
     }
 }
