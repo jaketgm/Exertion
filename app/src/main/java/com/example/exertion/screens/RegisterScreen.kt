@@ -45,8 +45,6 @@ fun RegisterScreen(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-
-        // USERNAME FIELD
         GradientInputField(
             label = "User Name",
             placeholder = "athena919",
@@ -56,7 +54,6 @@ fun RegisterScreen(
             onTextChange = { username = it }
         )
 
-        // EMAIL FIELD
         GradientInputField(
             label = "Email",
             placeholder = "you@example.com",
@@ -66,7 +63,6 @@ fun RegisterScreen(
             onTextChange = { email = it }
         )
 
-        // PASSWORD FIELD
         GradientInputField(
             label = "Password",
             placeholder = "********",
@@ -77,7 +73,6 @@ fun RegisterScreen(
             onTextChange = { password = it }
         )
 
-        // CONFIRM PASSWORD FIELD
         GradientInputField(
             label = "Confirm Password",
             placeholder = "********",
@@ -88,17 +83,14 @@ fun RegisterScreen(
             onTextChange = { confirmPassword = it }
         )
 
-        // ERROR
         if (errorMessage.isNotEmpty()) {
             Text(errorMessage, color = Color.Red, fontSize = 13.sp)
         }
 
-        // SUCCESS
         if (successMessage.isNotEmpty()) {
             Text(successMessage, color = Color(0xFF00FF99), fontSize = 13.sp)
         }
 
-        // REGISTER BUTTON
         Button(
             onClick = {
                 scope.launch {

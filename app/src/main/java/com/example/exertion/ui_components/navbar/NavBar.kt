@@ -63,7 +63,6 @@ fun NavBar(
             "$number$suffix"
         }
 
-    // Gradients
     val dark_gradient = Brush.radialGradient(
         colors = listOf(Color(0x66000000), Color(0x1A723333)),
         center = Offset(0f, 0f),
@@ -92,7 +91,6 @@ fun NavBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left side: Back button or date/greeting
             if (show_back_button) {
                 IconButton(onClick = { nav_controller?.popBackStack() }) {
                     Icon(
@@ -126,10 +124,9 @@ fun NavBar(
                 }
             }
 
-            // Right side: Profile/Settings button (XML placeholder)
             IconButton(onClick = on_profile_click) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_profile_placeholder), // make a placeholder XML vector
+                    painter = painterResource(id = R.drawable.ic_profile_placeholder),
                     contentDescription = "Profile",
                     tint = text_colour,
                     modifier = Modifier.size(28.dp)
@@ -170,7 +167,7 @@ fun PreviewNavBarDark() {
 @Composable
 fun PreviewNavBarLightWithBack() {
     NavBar(
-        user_name = "Jake", // ignored since show_back_button = true
+        user_name = "Jake",
         is_dark_mode = false,
         show_back_button = true,
         nav_controller = rememberNavController(),
@@ -183,7 +180,7 @@ fun PreviewNavBarLightWithBack() {
 @Composable
 fun PreviewNavBarDarkWithBack() {
     NavBar(
-        user_name = "Jake", // ignored since show_back_button = true
+        user_name = "Jake",
         is_dark_mode = true,
         show_back_button = true,
         nav_controller = rememberNavController(),

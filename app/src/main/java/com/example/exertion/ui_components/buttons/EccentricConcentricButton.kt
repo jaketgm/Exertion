@@ -1,13 +1,10 @@
 package com.example.exertion.ui_components.buttons
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,13 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.exertion.R
-import com.example.exertion.ui.components.GradientInputField
 import kotlinx.coroutines.delay
 
 @Composable
@@ -32,9 +26,8 @@ fun EccentricConcentricButton(
     onClick: (() -> Unit)? = null
 ) {
     var isPulsing by remember { mutableStateOf(false) }
-    var pulsePhase by remember { mutableStateOf(0) } // 0 = Default, 1-3 = Pulses
+    var pulsePhase by remember { mutableStateOf(0) }
 
-    // Infinite transition to smoothly animate the phase shifts
     val transition = rememberInfiniteTransition(label = "pulseTransition")
     val progress by transition.animateFloat(
         initialValue = 0f,
@@ -46,7 +39,6 @@ fun EccentricConcentricButton(
         label = "pulseAnim"
     )
 
-    // This coroutine manages the pulsing lifecycle
     LaunchedEffect(isPulsing) {
         if (isPulsing) {
             val startTime = System.currentTimeMillis()

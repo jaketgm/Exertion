@@ -10,19 +10,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.exertion.R
 import com.example.exertion.data.user_table.UserVM
 import com.example.exertion.ui.components.GradientInputField
 import com.example.exertion.ui_components.navbar.NavBar
 import com.example.exertion.utils.sha256
 import kotlinx.coroutines.launch
-import java.security.MessageDigest
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -39,7 +36,6 @@ fun LoginScreen(
 
     var errorMessage by remember { mutableStateOf("") }
 
-    // Background
     val backgroundBrush = Brush.verticalGradient(
         colors = listOf(Color(0xFF0A0A0A), Color(0xFF000000))
     )

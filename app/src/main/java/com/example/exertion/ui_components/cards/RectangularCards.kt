@@ -31,7 +31,7 @@ fun RectangularCard(
     val backgroundBrush = Brush.linearGradient(
         colors = listOf(
             Color(0xFFC20E35), // stop 0%
-            Color(0xFF5C0719)  // stop 100%
+            Color(0xFF5C0719) // stop 100%
         ),
         start = Offset(0f, 0f),
         end = Offset(600f, 600f)
@@ -42,7 +42,7 @@ fun RectangularCard(
             Color(0xFF252121), // 0%
             Color(0xE6342B2B), // 23%  (opacity 90%)
             Color(0xCC301919), // 77%  (opacity 80%)
-            Color(0x99320C0C)  // 100% (opacity 60%)
+            Color(0x99320C0C) // 100% (opacity 60%)
         ),
         start = Offset(0f, 0f),
         end = Offset(400f, 400f)

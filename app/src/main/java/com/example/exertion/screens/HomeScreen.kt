@@ -42,8 +42,8 @@ fun SectionDivider(title: String) {
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        Color(0x661A1818),  // 40% opacity
-                        Color(0x661D080D)   // 40% opacity
+                        Color(0x661A1818), // 40% opacity
+                        Color(0x661D080D) // 40% opacity
                     ),
                     start = Offset.Zero,
                     end = Offset(400f, 400f)
@@ -101,7 +101,6 @@ fun FeaturedWeeklyDataCard(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxSize()
         ) {
-            // Title + arrow
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -124,7 +123,6 @@ fun FeaturedWeeklyDataCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Bar chart (reuse MiniBarChart)
             MiniBarChart(
                 data = listOf(
                     0.7f, 0.4f, 0.6f, 0.9f, 0.3f, 0.5f, 0.8f,
@@ -147,7 +145,6 @@ fun HomeScreen(
     isDarkMode: Boolean,
     onProfileClick: () -> Unit
 ) {
-    // Background gradient for the whole screen.
     val backgroundBrush = Brush.verticalGradient(
         colors = listOf(
             Color(0xFF0A0A0A),
@@ -158,7 +155,7 @@ fun HomeScreen(
     Surface(
         modifier = Modifier
             .fillMaxSize(),
-        color = Color.Transparent      // <-- IMPORTANT
+        color = Color.Transparent
     ) {
         Column(
             modifier = Modifier
@@ -173,7 +170,6 @@ fun HomeScreen(
                 )
                 .verticalScroll(rememberScrollState())
         ) {
-            // Top Navigation Bar
             NavBar(
                 user_name = userName,
                 is_dark_mode = isDarkMode,
@@ -184,7 +180,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Today's Focus (FULL WIDTH CARD)
             RectangularCard(
                 header = "Today’s Focus",
                 focusText = "Upper Body  •  Bench: Wave I  ≪  155×8 Queued",
@@ -194,7 +189,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(22.dp))
 
-            // Grid of 4 Cards
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -202,7 +196,6 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
 
-                // Row 1 — Performance Feedback + EC Button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -224,7 +217,6 @@ fun HomeScreen(
                     )
                 }
 
-                // Row 2 — RIR/RPE + TUT
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween

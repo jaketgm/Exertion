@@ -57,20 +57,18 @@ fun MiniBarChart(
 fun MetricCard(
     header: String,
     subHeader: String,
-    barData: List<Float>, // normalized values 0.0–1.0
+    barData: List<Float>,
     modifier: Modifier = Modifier
 ) {
-    // --- Background gradient ---
     val backgroundBrush = Brush.linearGradient(
         colors = listOf(
-            Color(0xFFC20E35), // top
-            Color(0xFF5C0719)  // bottom
+            Color(0xFFC20E35),
+            Color(0xFF5C0719)
         ),
         start = Offset(0f, 0f),
         end = Offset(400f, 400f)
     )
 
-    // --- Outline gradient ---
     val outlineBrush = Brush.linearGradient(
         colors = listOf(
             Color(0xFF252121),
@@ -89,7 +87,6 @@ fun MetricCard(
             .border(BorderStroke(1.5.dp, outlineBrush), shape = RoundedCornerShape(20.dp))
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
-        // 1. Noise texture overlay
         Image(
             painter = painterResource(id = R.drawable.random_static),
             contentDescription = null,
@@ -100,7 +97,6 @@ fun MetricCard(
                 .clip(RoundedCornerShape(20.dp))
         )
 
-        // 2. Card content
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -108,7 +104,6 @@ fun MetricCard(
             horizontalAlignment = Alignment.Start
         ) {
             Column {
-                // Header
                 Text(
                     text = header,
                     color = Color.White,
@@ -116,7 +111,6 @@ fun MetricCard(
                     fontSize = 17.sp
                 )
 
-                // Sub-header
                 Text(
                     text = subHeader,
                     color = Color.White.copy(alpha = 0.75f),
@@ -126,7 +120,6 @@ fun MetricCard(
                 )
             }
 
-            // Bar chart
             MiniBarChart(
                 data = barData,
                 barColor = Color(0xFFFF2B2B),
@@ -134,7 +127,6 @@ fun MetricCard(
                 spaceWidth = 4.dp
             )
 
-            // Arrow (bottom-right)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
