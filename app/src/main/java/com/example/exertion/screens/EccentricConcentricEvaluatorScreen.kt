@@ -3,6 +3,7 @@ package com.example.exertion.screens
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -38,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -130,7 +134,7 @@ fun EccentricConcentricEvaluatorScreen(
         Spacer(Modifier.height(40.dp))
 
         val placeholderSet = ECSetData(
-            workoutExerciseId = 1,   // Temporary
+            workoutExerciseId = 1,
             setIndex = 1,
             reps = listOf(
                 ECRepData(
@@ -172,6 +176,13 @@ fun EccentricConcentricEvaluatorScreen(
                 onDismiss = { showExerciseMenu = false }
             )
         }
+
+        Spacer(Modifier.height(20.dp))
+
+        ECStatsContainer(
+            reps = placeholderSet.reps,
+            setSummary = placeholderSet
+        )
 
         Spacer(Modifier.height(20.dp))
     }
@@ -282,7 +293,6 @@ fun ExerciseDropdownMenu(
                     )
                 )
         ) {
-            // Scrollable content
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -309,7 +319,6 @@ fun ExerciseDropdownMenu(
                 }
             }
 
-            // Top fade
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -325,7 +334,6 @@ fun ExerciseDropdownMenu(
                     )
             )
 
-            // Bottom fade
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -341,6 +349,196 @@ fun ExerciseDropdownMenu(
                     )
             )
         }
+    }
+}
+
+@Composable
+fun ECStatsContainer(
+    reps: List<ECRepData>,
+    setSummary: ECSetData
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 350.dp)
+            .background(Color.Black.copy(alpha = 0.3f))
+            .padding(vertical = 24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.92f)
+                .wrapContentHeight()
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF0F0F0F))
+                .border(
+                    width = 1.dp,
+                    color = Color.White.copy(alpha = 0.35f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .padding(16.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+
+                ECSectionHeader(
+                    title = "Set Number: Set ${setSummary.setIndex},  Weight: ${setSummary.weightKg?.toInt()} kg"
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                ECRepsTable(reps)
+
+                Spacer(Modifier.height(16.dp))
+
+                ECSectionHeader(title = "Set Summary:")
+
+                Spacer(Modifier.height(8.dp))
+
+                ECSetSummary(setSummary)
+            }
+        }
+    }
+}
+
+@Composable
+fun ECSectionHeader(title: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFC63758))
+            .padding(vertical = 6.dp, horizontal = 8.dp)
+    ) {
+        Text(
+            text = title,
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+@Composable
+fun ECRepsTable(reps: List<ECRepData>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, Color.White.copy(alpha = 0.2f))
+    ) {
+        ECRepsHeaderRow()
+
+        reps.forEach { rep ->
+            ECRepsDataRow(rep)
+        }
+    }
+}
+
+@Composable
+fun ECRepsHeaderRow() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Black.copy(alpha = 0.35f))
+            .padding(vertical = 6.dp)
+    ) {
+        ECRepsHeaderCell("Rep", Modifier.weight(1f))
+        ECRepsHeaderCell("Eccentric", Modifier.weight(1f))
+        ECRepsHeaderCell("Concentric", Modifier.weight(1f))
+        ECRepsHeaderCell("Tempo", Modifier.weight(1f))
+        ECRepsHeaderCell("TUT", Modifier.weight(1f))
+        ECRepsHeaderCell("ROM", Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun ECRepsHeaderCell(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.padding(horizontal = 4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = Color(0xFFFF4D4D),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun ECRepsDataRow(rep: ECRepData) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+    ) {
+        ECRepsCell(rep.repIndex.toString(), Modifier.weight(1f))
+        ECRepsCell("%.1f s".format(rep.eccentricMs / 1000), Modifier.weight(1f))
+        ECRepsCell("%.1f s".format(rep.concentricMs / 1000), Modifier.weight(1f))
+        ECRepsCell("3-1-1-1", Modifier.weight(1f)) // placeholder tempo
+        ECRepsCell("%.1f s".format(rep.tutMs / 1000), Modifier.weight(1f))
+        ECRepsCell("%.0f°".format(rep.romDeg), Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun ECRepsCell(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.padding(horizontal = 4.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = 13.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun ECSetSummary(data: ECSetData) {
+    val avgEcc = data.reps.map { it.eccentricMs }.average() / 1000
+    val avgCon = data.reps.map { it.concentricMs }.average() / 1000
+    val totalTUT = data.reps.sumOf { it.tutMs } / 1000
+    val avgTUT = data.reps.map { it.tutMs }.average() / 1000
+    val tempoConsistency = 0.22 // placeholder
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        ECSetSummaryRow("Avg Eccentric:", "%.2f s".format(avgEcc))
+        ECSetSummaryRow("Avg Concentric:", "%.2f s".format(avgCon))
+        ECSetSummaryRow("Avg TUT/rep:", "%.2f s".format(avgTUT))
+        ECSetSummaryRow("Total TUT:", "%.1f s".format(totalTUT))
+        ECSetSummaryRow("Tempo Consistency:", "± %.2f s".format(tempoConsistency))
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = "Note: Good overall control",
+            color = Color.White,
+            fontSize = 13.sp
+        )
+    }
+}
+
+@Composable
+fun ECSetSummaryRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, color = Color.White, fontSize = 13.sp)
+        Text(value, color = Color.White, fontSize = 13.sp)
     }
 }
 

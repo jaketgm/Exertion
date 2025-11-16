@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.androidx.compose.foundation.layout)
     ksp("androidx.room:room-compiler:2.8.1")
     androidTestImplementation("androidx.room:room-testing:2.8.1")
 
