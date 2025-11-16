@@ -48,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.exertion.R
 import com.example.exertion.data.ec.ECRepData
+import com.example.exertion.data.ec.ECRepDetector
 import com.example.exertion.data.ec.ECSetData
 import com.example.exertion.data.ec.saveECSetToDB
 import com.example.exertion.data.exercise.ExerciseTable
@@ -74,7 +75,21 @@ fun EccentricConcentricEvaluatorScreen(
     val exercises by exerciseVM.allExercises.collectAsState(initial = emptyList())
     var showExerciseMenu by remember { mutableStateOf(false) }
 
+    // live rep tracking
+    var reps by remember { mutableStateOf(emptyList<ECRepData>()) }
+    val repDetector = remember { ECRepDetector() }
+
     val scope = rememberCoroutineScope()
+
+    // Derive current set summary from live reps
+    val currentSet = ECSetData(
+        workoutExerciseId = 1, // TODO: tie to chosen exercise
+        weightKg = 60.0, // TODO: pull from workout context
+        setIndex = 1,
+        reps = reps,
+        rir = null,
+        rpe = null
+    )
 
     Column(
         modifier = Modifier
@@ -101,8 +116,14 @@ fun EccentricConcentricEvaluatorScreen(
             if (isDetecting) {
                 InlineCameraPreview(
                     modifier = Modifier.matchParentSize(),
-                    onDetectionUpdated = { detected ->
-                        detectionText = detected
+                    onLabelUpdated = { label ->
+                        detectionText = label
+                    },
+                    onFrameMetrics = { metrics ->
+                        val newRep = repDetector.onSample(metrics)
+                        if (newRep != null) {
+                            reps = reps + newRep
+                        }
                     }
                 )
             }
@@ -131,33 +152,13 @@ fun EccentricConcentricEvaluatorScreen(
 
         Spacer(Modifier.height(40.dp))
 
-        Spacer(Modifier.height(40.dp))
-
-        val placeholderSet = ECSetData(
-            workoutExerciseId = 1,
-            setIndex = 1,
-            reps = listOf(
-                ECRepData(
-                    repIndex = 1,
-                    eccentricMs = 1000.0,
-                    concentricMs = 800.0,
-                    tutMs = 1800.0,
-                    velocity = 0.35,
-                    romDeg = 60.0
-                )
-            ),
-            weightKg = 60.0,
-            rir = 2.0,
-            rpe = 8.0
-        )
-
         ECActionBar(
             onSaveData = {
                 scope.launch {
                     saveECSetToDB(
                         setVM = setVM,
                         repVM = repVM,
-                        data = placeholderSet
+                        data = currentSet
                     )
                 }
             },
@@ -172,6 +173,7 @@ fun EccentricConcentricEvaluatorScreen(
                 onSelect = { selected ->
                     detectionText = "Exercise: ${selected.name}"
                     showExerciseMenu = false
+                    // TODO: also update workoutExerciseId & weightKg if you want
                 },
                 onDismiss = { showExerciseMenu = false }
             )
@@ -179,10 +181,26 @@ fun EccentricConcentricEvaluatorScreen(
 
         Spacer(Modifier.height(20.dp))
 
-        ECStatsContainer(
-            reps = placeholderSet.reps,
-            setSummary = placeholderSet
-        )
+        if (reps.isNotEmpty()) {
+            ECStatsContainer(
+                reps = reps,
+                setSummary = currentSet
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 200.dp)
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No reps detected yet. Start moving through full ROM.",
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 14.sp
+                )
+            }
+        }
 
         Spacer(Modifier.height(20.dp))
     }

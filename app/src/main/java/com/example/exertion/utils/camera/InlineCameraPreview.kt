@@ -13,12 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.exertion.data.ec.ECFrameMetrics
 import java.util.concurrent.Executors
 
 @Composable
 fun InlineCameraPreview(
     modifier: Modifier = Modifier,
-    onDetectionUpdated: (String) -> Unit
+    onLabelUpdated: (String) -> Unit,
+    onFrameMetrics: (ECFrameMetrics) -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -63,10 +65,21 @@ fun InlineCameraPreview(
                         preview.setSurfaceProvider(surfaceProvider)
                         Log.d("EC-PREVIEW", "SurfaceProvider SET")
 
-                        val analyzer = ObjectRecognitionAnalyzer(ctx) {
-                            Log.d("EC-PREVIEW", "Analyzer detected object: $it")
-                            onDetectionUpdated(it)
-                        }
+                        val analyzer = ObjectRecognitionAnalyzer(
+                            context = ctx,
+                            onDetectedObjectUpdated = { label ->
+                                Log.d("EC-PREVIEW", "Analyzer label: $label")
+                                onLabelUpdated(label)
+                            },
+                            onFrameMetrics = { metrics ->
+                                Log.d(
+                                    "EC-PREVIEW",
+                                    "Frame metrics: rom=${metrics.romFraction}, vel=${metrics.velocity}"
+                                )
+                                onFrameMetrics(metrics)
+                            }
+                        )
+
                         analysis.setAnalyzer(
                             Executors.newSingleThreadExecutor(),
                             analyzer

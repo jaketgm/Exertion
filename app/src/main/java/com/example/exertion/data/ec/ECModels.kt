@@ -17,3 +17,16 @@ data class ECSetData(
     val rir: Double? = null,
     val rpe: Double? = null
 )
+
+enum class ECPhase {
+    IDLE,
+    ECCENTRIC,
+    CONCENTRIC
+}
+
+data class ECFrameMetrics(
+    val timestampMs: Long,
+    val romFraction: Float, // 0f..1f (0 = bottom, 1 = top) normalized from box center
+    val velocity: Float, // change in romFraction / second (signed)
+    val phase: ECPhase
+)

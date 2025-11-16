@@ -10,6 +10,8 @@ import android.graphics.YuvImage
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.example.exertion.data.ec.ECFrameMetrics
+import com.example.exertion.data.ec.ECPhase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -43,7 +45,8 @@ fun loadLabels(context: Context, filename: String): List<String> {
 
 class ObjectRecognitionAnalyzer(
     private val context: Context,
-    private val onDetectedObjectUpdated: (String) -> Unit
+    private val onDetectedObjectUpdated: (String) -> Unit,
+    private val onFrameMetrics: ((ECFrameMetrics) -> Unit)? = null
 ) : ImageAnalysis.Analyzer {
     companion object {
         const val THROTTLE_TIMEOUT_MS = 1_000L
@@ -55,6 +58,11 @@ class ObjectRecognitionAnalyzer(
     private var interpreter: Interpreter? = null
     private var labels: List<String> = emptyList()
     private val last_analyzed_time = AtomicLong(0L)
+
+    private var lastYCenter: Float? = null
+    private var lastYTime: Long? = null
+    private var minY: Float = Float.POSITIVE_INFINITY
+    private var maxY: Float = Float.NEGATIVE_INFINITY
 
     init {
         scope.launch {
@@ -185,6 +193,78 @@ class ObjectRecognitionAnalyzer(
                     bestConf = totalConf
                     bestClass = clsIdx
                 }
+            }
+        }
+
+        if (onFrameMetrics != null) {
+
+            val now = System.currentTimeMillis()
+
+            // For the best anchor: find anchor index again
+            var yCenterRaw: Float? = null
+
+            if (bestClass >= 0) {
+                var bestIdx = -1
+                var bestScore = 0f
+
+                for (i in 0 until numAnchors) {
+                    val conf = sigmoid(output[0][4][i])
+                    if (conf > 0.05f) {
+
+                        var maxProb = 0f
+                        for (c in 5 until numChannels) {
+                            val prob = sigmoid(output[0][c][i])
+                            if (prob > maxProb) maxProb = prob
+                        }
+
+                        val total = conf * maxProb
+                        if (total > bestScore) {
+                            bestScore = total
+                            bestIdx = i
+                        }
+                    }
+                }
+
+                if (bestIdx >= 0) {
+                    yCenterRaw = output[0][1][bestIdx]
+                }
+            }
+
+            if (yCenterRaw != null) {
+                val y = yCenterRaw
+
+                if (y < minY) minY = y
+                if (y > maxY) maxY = y
+
+                val span = (maxY - minY).takeIf { it > 1e-4f } ?: 1f
+                val romFraction = ((y - minY) / span).coerceIn(0f, 1f)
+
+                val lastY = lastYCenter
+                val lastT = lastYTime
+
+                var velocity = 0f
+                if (lastY != null && lastT != null) {
+                    val dt = (now - lastT).coerceAtLeast(1).toFloat() / 1000f
+                    velocity = (romFraction - lastY) / dt
+                }
+
+                lastYCenter = romFraction
+                lastYTime = now
+
+                val phase = when {
+                    velocity > 0.05f -> ECPhase.CONCENTRIC
+                    velocity < -0.05f -> ECPhase.ECCENTRIC
+                    else -> ECPhase.IDLE
+                }
+
+                val metrics = ECFrameMetrics(
+                    timestampMs = now,
+                    romFraction = romFraction,
+                    velocity = velocity,
+                    phase = phase
+                )
+
+                onFrameMetrics.invoke(metrics)
             }
         }
 
