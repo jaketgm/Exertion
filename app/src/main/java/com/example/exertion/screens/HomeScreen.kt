@@ -15,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -26,11 +27,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.exertion.R
+import com.example.exertion.data.datastore.UserPreferencesDataStore
 import com.example.exertion.ui.components.RectangularCard
 import com.example.exertion.ui.components.SquareCard
 import com.example.exertion.ui_components.cards.MetricCard
 import com.example.exertion.ui_components.cards.MiniBarChart
 import com.example.exertion.ui_components.navbar.NavBar
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun SectionDivider(title: String) {
@@ -152,6 +156,11 @@ fun HomeScreen(
         )
     )
 
+    val context = LocalContext.current
+
+    val prefs = UserPreferencesDataStore(context)
+    val userId by prefs.userIdFlow.collectAsState(initial = null)
+
     Surface(
         modifier = Modifier
             .fillMaxSize(),
@@ -171,11 +180,17 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             NavBar(
-                user_name = userName,
-                is_dark_mode = isDarkMode,
+                user_name = if (userId != null) "Jake" else "Guest",
+                is_dark_mode = true,
                 show_back_button = false,
                 nav_controller = navController,
-                on_profile_click = onProfileClick
+                loggedInUserId = userId,
+                on_profile_click = {
+                    navController?.navigate("login")
+                },
+                on_settings_click = {
+                    navController?.navigate("settings/$userId")
+                }
             )
 
             Spacer(modifier = Modifier.height(20.dp))

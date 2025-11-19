@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.exertion.data.daily_user_metric_snapshot.DailyUserMetricSnapshot
 import com.example.exertion.data.daily_user_metric_snapshot.read_dao.DailyUserMetricSnapshotReadDao
 import com.example.exertion.data.daily_user_metric_snapshot.write_dao.DailyUserMetricSnapshotWriteDao
@@ -38,7 +40,7 @@ import com.example.exertion.data.workout_metric_snapshot.write_dao.WorkoutMetric
 
 @Database(
     entities = [UserTable::class, PersonalAnalytics::class, DailyUserMetricSnapshot::class, ExerciseTable::class, ExerciseMetricSnapshot::class, RepEntry::class, SetEntry::class, Workout::class, WorkoutExercise::class, WorkoutMetricSnapshot::class],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -65,22 +67,33 @@ abstract class ExertionDB: RoomDatabase() {
     abstract fun exerciseMetricSnapshotWriteDao(): ExerciseMetricSnapshotWriteDao
 
     companion object {
-        // writes are visible to other threads
         @Volatile
-        private var INSTANCE: ExertionDB? = null // singleton class
+        private var INSTANCE: ExertionDB? = null
+
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE user_table ADD COLUMN age INTEGER")
+                db.execSQL("ALTER TABLE user_table ADD COLUMN weight_kg REAL")
+                db.execSQL("ALTER TABLE user_table ADD COLUMN height_cm REAL")
+                db.execSQL("ALTER TABLE user_table ADD COLUMN gender TEXT")
+            }
+        }
 
         fun getDatabase(context: Context): ExertionDB {
             val temp_instance = INSTANCE
             if (temp_instance != null) {
                 return temp_instance
             }
-            // protected from concurrent execution by multiple threads
+
             synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     ExertionDB::class.java,
                     "exertion_database"
-                ).build()
+                )
+                    .addMigrations(MIGRATION_1_2)
+                    .build()
+
                 INSTANCE = instance
                 return instance
             }

@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -46,7 +47,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.exertion.R
+import com.example.exertion.data.datastore.UserPreferencesDataStore
 import com.example.exertion.data.ec.ECRepData
 import com.example.exertion.data.ec.ECRepDetector
 import com.example.exertion.data.ec.ECSetData
@@ -97,12 +100,24 @@ fun EccentricConcentricEvaluatorScreen(
             .background(Color.Black)
             .verticalScroll(rememberScrollState())
     ) {
+        val context = LocalContext.current
+        val prefs = UserPreferencesDataStore(context)
+        val userId by prefs.userIdFlow.collectAsState(initial = null)
+
         NavBar(
-            user_name = "",
+            user_name = if (userId != null) "Jake" else "Guest",
             is_dark_mode = true,
             show_back_button = true,
             nav_controller = navController,
-            on_profile_click = {}
+            loggedInUserId = userId,
+            on_profile_click = {
+                // not logged in
+                navController?.navigate("login")
+            },
+            on_settings_click = {
+                // logged in
+                navController?.navigate("settings/$userId")
+            }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -578,48 +593,60 @@ fun PreviewEccentricConcentricEvaluatorScreen() {
             .padding(top = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val context = LocalContext.current
+        val prefs = UserPreferencesDataStore(context)
+        val userId by prefs.userIdFlow.collectAsState(initial = null)
+
+        val navController = rememberNavController()
+
         NavBar(
-            user_name = "Jake",
+            user_name = if (userId != null) "Jake" else "Guest",
             is_dark_mode = true,
             show_back_button = true,
-            nav_controller = null,
-            on_profile_click = {}
+            nav_controller = navController,
+            loggedInUserId = userId,
+            on_profile_click = {
+                navController.navigate("login")
+            },
+            on_settings_click = {
+                navController.navigate("settings/$userId")
+            }
+        )
+    }
+
+    Spacer(Modifier.height(20.dp))
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(350.dp)
+            .background(Color(0xFF0A0A0A))
+            .padding(12.dp)
+    ) {
+        Text(
+            text = detectionText,
+            color = Color.White,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold
         )
 
-        Spacer(Modifier.height(20.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(350.dp)
-                .background(Color(0xFF0A0A0A))
-                .padding(12.dp)
-        ) {
-            Text(
-                text = detectionText,
-                color = Color.White,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(8.dp),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
+        if (!isDetecting) {
+            EccentricConcentricButton(
+                text = "Detect",
+                size = 160f,
+                onClick = { isDetecting = true },
+                modifier = Modifier.align(Alignment.Center)
             )
-
-            if (!isDetecting) {
-                EccentricConcentricButton(
-                    text = "Detect",
-                    size = 160f,
-                    onClick = { isDetecting = true },
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                Text(
-                    text = "Detecting… (Preview Mode)",
-                    color = Color.White.copy(alpha = 0.9f),
-                    modifier = Modifier.align(Alignment.Center),
-                    fontSize = 18.sp
-                )
-            }
+        } else {
+            Text(
+                text = "Detecting… (Preview Mode)",
+                color = Color.White.copy(alpha = 0.9f),
+                modifier = Modifier.align(Alignment.Center),
+                fontSize = 18.sp
+            )
         }
     }
 }

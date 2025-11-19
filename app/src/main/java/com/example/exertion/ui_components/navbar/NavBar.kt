@@ -45,7 +45,9 @@ fun NavBar(
     is_dark_mode: Boolean,
     show_back_button: Boolean = false,
     nav_controller: NavController?,
+    loggedInUserId: Int?,
     on_profile_click: () -> Unit,
+    on_settings_click: () -> Unit
 ) {
     val namdhinggo = FontFamily(Font(R.font.namdhinggo_regular))
     val now = LocalDate.now()
@@ -124,66 +126,28 @@ fun NavBar(
                 }
             }
 
-            IconButton(onClick = on_profile_click) {
+            IconButton(
+                onClick = {
+                    if (loggedInUserId == null) {
+                        on_profile_click()
+                    } else {
+                        on_settings_click()
+                    }
+                }
+            ) {
+                val iconRes =
+                    if (loggedInUserId == null)
+                        R.drawable.ic_profile_placeholder
+                    else
+                        R.drawable.ic_settings
+
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_profile_placeholder),
-                    contentDescription = "Profile",
+                    painter = painterResource(id = iconRes),
+                    contentDescription = if (loggedInUserId == null) "Profile" else "Settings",
                     tint = text_colour,
                     modifier = Modifier.size(28.dp)
                 )
             }
         }
     }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true, name = "Light Mode - Default")
-@Composable
-fun PreviewNavBarLight() {
-    NavBar(
-        user_name = "Jake",
-        is_dark_mode = false,
-        show_back_button = false,
-        nav_controller = rememberNavController(),
-        on_profile_click = {}
-    )
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true, name = "Dark Mode - Default", backgroundColor = 0xFF000000)
-@Composable
-fun PreviewNavBarDark() {
-    NavBar(
-        user_name = "Jake",
-        is_dark_mode = true,
-        show_back_button = false,
-        nav_controller = rememberNavController(),
-        on_profile_click = {}
-    )
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true, name = "Light Mode - With Back Button")
-@Composable
-fun PreviewNavBarLightWithBack() {
-    NavBar(
-        user_name = "Jake",
-        is_dark_mode = false,
-        show_back_button = true,
-        nav_controller = rememberNavController(),
-        on_profile_click = {}
-    )
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true, name = "Dark Mode - With Back Button", backgroundColor = 0xFF000000)
-@Composable
-fun PreviewNavBarDarkWithBack() {
-    NavBar(
-        user_name = "Jake",
-        is_dark_mode = true,
-        show_back_button = true,
-        nav_controller = rememberNavController(),
-        on_profile_click = {}
-    )
 }

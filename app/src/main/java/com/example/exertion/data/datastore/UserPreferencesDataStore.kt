@@ -10,25 +10,26 @@ import kotlinx.coroutines.flow.map
 private val Context.dataStore by preferencesDataStore(name = "user_prefs")
 
 class UserPreferencesDataStore(private val context: Context) {
+
     companion object {
         private val USER_ID = intPreferencesKey("logged_in_user_id")
     }
 
-    // Read the logged-in user ID (nullable)
+    // Flow that emits user ID or null
     val userIdFlow: Flow<Int?> = context.dataStore.data
         .map { prefs ->
             prefs[USER_ID]
         }
 
-    // Save logged-in user ID
+    // Save the logged-in user ID
     suspend fun setLoggedInUserId(userId: Int) {
         context.dataStore.edit { prefs ->
             prefs[USER_ID] = userId
         }
     }
 
-    // Clear user ID on logout
-    suspend fun clearUserId() {
+    // Clear user ID for logout
+    suspend fun clearLoggedInUser() {
         context.dataStore.edit { prefs ->
             prefs.remove(USER_ID)
         }

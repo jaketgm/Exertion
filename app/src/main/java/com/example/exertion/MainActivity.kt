@@ -17,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.exertion.data.datastore.UserPreferencesDataStore
@@ -27,6 +28,8 @@ import com.example.exertion.screens.LoginScreen
 import com.example.exertion.ui.theme.ExertionTheme
 import kotlinx.coroutines.launch
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.example.exertion.screens.SettingsScreen
 import com.example.exertion.utils.camera.CameraPermissionGate
 
 class MainActivity : ComponentActivity() {
@@ -82,6 +85,29 @@ class MainActivity : ComponentActivity() {
                                 exerciseName = "Bench Press"
                             )
                         }
+                    }
+
+                    composable(
+                        route = "settings/{userId}",
+                        arguments = listOf(
+                            navArgument("userId") { type = NavType.IntType }
+                        )
+                    ) { backStackEntry ->
+                        val uid = backStackEntry.arguments!!.getInt("userId")
+                        SettingsScreen(
+                            navController = navController,
+                            userId = uid
+                        )
+                    }
+
+                    composable("login") {
+                        LoginScreen(
+                            navController = navController,
+                            userVM = userVM,
+                            onLoginSuccess = { uid ->
+                                scope.launch { userPrefs.setLoggedInUserId(uid) }
+                            }
+                        )
                     }
                 }
             }

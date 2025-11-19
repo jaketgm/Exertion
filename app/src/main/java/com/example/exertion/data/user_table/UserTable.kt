@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "user_table",
-    // enforce email + username uniqueness
     indices = [
         Index(value = ["email"], unique = true),
         Index(value = ["username"], unique = true)
@@ -16,17 +15,32 @@ import androidx.room.PrimaryKey
 data class UserTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "user_id")
-    val user_id: Int = 0, // needs to be primary key and also auto increment
+    val user_id: Int = 0,
 
     @ColumnInfo(name = "username", collate = ColumnInfo.NOCASE)
-    val username: String?, // nullable
+    val username: String?,
 
     @ColumnInfo(name = "email", collate = ColumnInfo.NOCASE)
     val email: String,
 
     @ColumnInfo(name = "password_hash")
-    val password_hash: String?, // nullable
+    val password_hash: String?,
 
     @ColumnInfo(name = "created_at")
-    val created_at: Long
+    val created_at: Long,
+
+    // ------------------------
+    // NEW SETTINGS FIELDS
+    // ------------------------
+    @ColumnInfo(name = "age")
+    val age: Int? = null,
+
+    @ColumnInfo(name = "weight_kg")
+    val weight_kg: Double? = null,
+
+    @ColumnInfo(name = "height_cm")
+    val height_cm: Double? = null,
+
+    @ColumnInfo(name = "gender")
+    val gender: String? = null
 )

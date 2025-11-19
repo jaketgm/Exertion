@@ -51,11 +51,13 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             NavBar(
-                user_name = "",
+                user_name = "Guest",
                 is_dark_mode = true,
                 show_back_button = true,
                 nav_controller = navController,
-                on_profile_click = {}
+                loggedInUserId = null,
+                on_profile_click = { /* No-op on login screen */ },
+                on_settings_click = { /* No settings access while logged out */ }
             )
 
             Spacer(Modifier.height(60.dp))
