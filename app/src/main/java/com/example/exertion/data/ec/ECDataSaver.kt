@@ -12,7 +12,6 @@ suspend fun saveECSetToDB(
 ): Int {
     val timestamp = System.currentTimeMillis()
 
-    // ---- Insert SET_ENTRY ----
     val setEntry = SetEntry(
         set_id = 0,
         workout_exercise_id = data.workoutExerciseId,
@@ -38,7 +37,6 @@ suspend fun saveECSetToDB(
 
     val setId = setVM.addSetEntryReturningId(setEntry)
 
-    // ---- Insert REP_ENTRY rows ----
     data.reps.forEach { rep ->
         val repEntry = RepEntry(
             rep_id = 0,

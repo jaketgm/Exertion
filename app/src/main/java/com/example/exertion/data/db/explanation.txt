@@ -1,0 +1,4 @@
+Used for:
+- DB-driven workout-of-the-day
+- Sets persisted to DB
+- Exercise reordering stored in DB

@@ -51,7 +51,7 @@ data class SetEntry(
     val rpe: Double?, // Allowed range ~ [1..10]
 
     @ColumnInfo(name = "rest_sec")
-    val rest_sec: Float?,
+    val rest_sec: Int?,
 
     @ColumnInfo(name = "is_warmup", defaultValue = "0")
     val is_warmup: Boolean = false,

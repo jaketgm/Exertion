@@ -20,4 +20,15 @@ class SetEntryVM(application: Application): AndroidViewModel(application) {
     suspend fun addSetEntryReturningId(setEntry: SetEntry): Int {
         return set_entry_repository.addSetEntryReturningId(setEntry).toInt()
     }
+
+    suspend fun addSetEntry(setEntry: SetEntry) {
+        set_entry_repository.addSetEntry(setEntry)
+    }
+
+    suspend fun deleteSet(id: Int) {
+        set_entry_repository.deleteSet(id)
+    }
+
+    suspend fun addSetForWorkoutExercise(workoutExerciseId: Int) =
+        set_entry_repository.addSetForWorkoutExercise(workoutExerciseId)
 }

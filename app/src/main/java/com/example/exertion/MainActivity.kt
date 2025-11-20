@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.exertion.screens.SettingsScreen
+import com.example.exertion.screens.TodaysFocusScreen
 import com.example.exertion.utils.camera.CameraPermissionGate
 
 class MainActivity : ComponentActivity() {
@@ -78,6 +79,10 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    composable("todays_focus") {
+                        TodaysFocusScreen(navController = navController)
+                    }
+
                     composable("eccentric_concentric") {
                         CameraPermissionGate {
                             EccentricConcentricEvaluatorScreen(
@@ -107,6 +112,12 @@ class MainActivity : ComponentActivity() {
                             onLoginSuccess = { uid ->
                                 scope.launch { userPrefs.setLoggedInUserId(uid) }
                             }
+                        )
+                    }
+
+                    composable("todays_focus") {
+                        TodaysFocusScreen(
+                            navController = navController
                         )
                     }
                 }

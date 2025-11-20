@@ -40,7 +40,7 @@ import com.example.exertion.data.workout_metric_snapshot.write_dao.WorkoutMetric
 
 @Database(
     entities = [UserTable::class, PersonalAnalytics::class, DailyUserMetricSnapshot::class, ExerciseTable::class, ExerciseMetricSnapshot::class, RepEntry::class, SetEntry::class, Workout::class, WorkoutExercise::class, WorkoutMetricSnapshot::class],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -70,12 +70,152 @@ abstract class ExertionDB: RoomDatabase() {
         @Volatile
         private var INSTANCE: ExertionDB? = null
 
-        val MIGRATION_1_2 = object : Migration(1, 2) {
+        val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE user_table ADD COLUMN age INTEGER")
-                db.execSQL("ALTER TABLE user_table ADD COLUMN weight_kg REAL")
-                db.execSQL("ALTER TABLE user_table ADD COLUMN height_cm REAL")
-                db.execSQL("ALTER TABLE user_table ADD COLUMN gender TEXT")
+
+                // --------------------------------------------------
+                // 1. WORKOUT (add day_of_week)
+                // --------------------------------------------------
+                db.execSQL("""
+            CREATE TABLE workout_new (
+                workout_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                user_id INTEGER NOT NULL,
+                name TEXT,
+                started_at INTEGER NOT NULL,
+                ended_at INTEGER,
+                kind TEXT NOT NULL,
+                mesocycle_name TEXT,
+                mesocycle_week INTEGER,
+                notes TEXT,
+                day_of_week INTEGER NOT NULL DEFAULT 1,
+                FOREIGN KEY(user_id) REFERENCES user_table(user_id) ON DELETE CASCADE
+            )
+        """.trimIndent())
+
+                db.execSQL("""
+            INSERT INTO workout_new (
+                workout_id, user_id, name, started_at, ended_at, kind,
+                mesocycle_name, mesocycle_week, notes, day_of_week
+            )
+            SELECT workout_id, user_id, name, started_at, ended_at, kind,
+                   mesocycle_name, mesocycle_week, notes, 1
+            FROM workout
+        """.trimIndent())
+
+                db.execSQL("DROP TABLE workout")
+                db.execSQL("ALTER TABLE workout_new RENAME TO workout")
+
+                db.execSQL("""
+            CREATE UNIQUE INDEX index_workout_user_id_started_at
+            ON workout(user_id, started_at)
+        """.trimIndent())
+
+
+                // --------------------------------------------------
+                // 2. WORKOUT_EXERCISE (major changes: new FKs + indexes)
+                // --------------------------------------------------
+                db.execSQL("""
+            CREATE TABLE workout_exercise_new (
+                workout_exercise_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                workout_id INTEGER NOT NULL,
+                exercise_id INTEGER NOT NULL,
+                exercise_order INTEGER NOT NULL,
+                target_sets INTEGER,
+                target_reps INTEGER,
+                target_weight REAL,
+                FOREIGN KEY(workout_id) REFERENCES workout(workout_id) ON DELETE CASCADE,
+                FOREIGN KEY(exercise_id) REFERENCES exercise_table(exercise_id) ON DELETE RESTRICT
+            )
+        """.trimIndent())
+
+                db.execSQL("""
+            INSERT INTO workout_exercise_new (
+                workout_exercise_id, workout_id, exercise_id,
+                exercise_order, target_sets, target_reps, target_weight
+            )
+            SELECT workout_exercise_id, workout_id, exercise_id,
+                   exercise_order, target_sets, target_reps, target_weight
+            FROM workout_exercise
+        """.trimIndent())
+
+                db.execSQL("DROP TABLE workout_exercise")
+                db.execSQL("ALTER TABLE workout_exercise_new RENAME TO workout_exercise")
+
+                db.execSQL("""
+            CREATE UNIQUE INDEX index_workout_exercise_workout_id_exercise_order
+            ON workout_exercise(workout_id, exercise_order)
+        """.trimIndent())
+
+                db.execSQL("""
+            CREATE INDEX index_workout_exercise_workout_id
+            ON workout_exercise(workout_id)
+        """.trimIndent())
+
+                db.execSQL("""
+            CREATE INDEX index_workout_exercise_exercise_id
+            ON workout_exercise(exercise_id)
+        """.trimIndent())
+
+
+                // --------------------------------------------------
+                // 3. SET_ENTRY (massively changed — must rebuild)
+                // --------------------------------------------------
+                db.execSQL("""
+            CREATE TABLE set_entry_new (
+                set_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                workout_exercise_id INTEGER NOT NULL,
+                set_index INTEGER NOT NULL,
+                set_type TEXT,
+                reps INTEGER NOT NULL,
+                weight_kg REAL,
+                tut_ms REAL,
+                rir REAL,
+                rpe REAL,
+                rest_sec INTEGER,
+                is_warmup INTEGER NOT NULL DEFAULT 0,
+                is_failure INTEGER NOT NULL DEFAULT 0,
+                timestamp INTEGER NOT NULL,
+                top REAL NOT NULL DEFAULT 0.0,
+                bottom REAL NOT NULL DEFAULT 0.0,
+                tempo_notation TEXT,
+                velocity_loss_pct REAL,
+                rir_suggested REAL,
+                rpe_suggested REAL,
+                suggestion_confidence REAL,
+                FOREIGN KEY(workout_exercise_id)
+                    REFERENCES workout_exercise(workout_exercise_id)
+                    ON DELETE CASCADE
+            )
+        """.trimIndent())
+
+                db.execSQL("""
+            INSERT INTO set_entry_new (
+                set_id, workout_exercise_id, set_index, set_type,
+                reps, weight_kg, tut_ms, rir, rpe,
+                rest_sec, is_warmup, is_failure, timestamp,
+                top, bottom, tempo_notation, velocity_loss_pct,
+                rir_suggested, rpe_suggested, suggestion_confidence
+            )
+            SELECT set_id, workout_exercise_id, set_index, set_type,
+                   reps, weight_kg, tut_ms, rir, rpe,
+                   rest_sec, is_warmup, is_failure, timestamp,
+                   top, bottom, tempo_notation, velocity_loss_pct,
+                   rir_suggested, rpe_suggested, suggestion_confidence
+            FROM set_entry
+        """.trimIndent())
+
+                db.execSQL("DROP TABLE set_entry")
+                db.execSQL("ALTER TABLE set_entry_new RENAME TO set_entry")
+
+                db.execSQL("""
+            CREATE UNIQUE INDEX index_set_entry_workout_exercise_id_set_index
+            ON set_entry(workout_exercise_id, set_index)
+        """.trimIndent())
+
+                db.execSQL("""
+            CREATE INDEX index_set_entry_workout_exercise_id
+            ON set_entry(workout_exercise_id)
+        """.trimIndent())
             }
         }
 
@@ -91,7 +231,8 @@ abstract class ExertionDB: RoomDatabase() {
                     ExertionDB::class.java,
                     "exertion_database"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration(true)
+                    .addMigrations(MIGRATION_2_3)
                     .build()
 
                 INSTANCE = instance

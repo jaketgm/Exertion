@@ -47,5 +47,8 @@ data class Workout(
     val mesocycle_week: Int?,
 
     @ColumnInfo(name = "notes")
-    val notes: String?
+    val notes: String?,
+
+    @ColumnInfo(name = "day_of_week")
+    val day_of_week: Int, // 1=Monday … 7=Sunday
 )

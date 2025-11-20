@@ -197,9 +197,12 @@ fun HomeScreen(
 
             RectangularCard(
                 header = "Today’s Focus",
-                focusText = "Upper Body  •  Bench: Wave I  ≪  155×8 Queued",
+                focusText = "...",
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
+                    .clickable {
+                        navController?.navigate("todays_focus")
+                    }
             )
 
             Spacer(modifier = Modifier.height(22.dp))

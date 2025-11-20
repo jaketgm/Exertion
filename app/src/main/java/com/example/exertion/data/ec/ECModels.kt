@@ -30,3 +30,19 @@ data class ECFrameMetrics(
     val velocity: Float, // change in romFraction / second (signed)
     val phase: ECPhase
 )
+
+data class UIExerciseBlock(
+    val workoutExerciseId: Int,
+    val exerciseId: Int,
+    val name: String,
+    val sets: List<UISetRow>
+)
+
+data class UISetRow(
+    val setId: Int,
+    val setIndex: Int,
+    val reps: String,
+    val weight: Double,
+    val restSeconds: Int?,
+    val oneRmPercent: Int?
+)
