@@ -168,25 +168,18 @@ fun TodaysFocusScreen(
 
         Spacer(Modifier.height(20.dp))
 
-        // Add New Exercise (bottom button)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(Color(0xFF1A1A1A))
-                .clickable {
-                    // TODO: Open exercise selector
+        AddExerciseButton(
+            onAdd = {
+                scope.launch {
+                    if (todayWorkoutId != null) {
+                        workoutExerciseVM.addWorkoutExerciseSimple(
+                            workoutId = todayWorkoutId!!,
+                            exerciseId = 1 // Bench Press
+                        )
+                    }
                 }
-                .padding(vertical = 14.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "+ Add Exercise",
-                color = Color.White,
-                fontSize = 16.sp
-            )
-        }
+            }
+        )
 
         Spacer(Modifier.height(60.dp))
     }

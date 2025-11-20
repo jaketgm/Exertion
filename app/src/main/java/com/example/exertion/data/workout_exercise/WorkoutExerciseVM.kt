@@ -36,4 +36,12 @@ class WorkoutExerciseVM(application: Application) : AndroidViewModel(application
 
     suspend fun updateExerciseOrder(id: Int, newOrder: Int) =
         repo.updateExerciseOrder(id, newOrder)
+
+    suspend fun addExerciseToWorkout(workoutId: Int, exerciseId: Int) {
+        repo.addWorkoutExerciseSimple(workoutId, exerciseId)
+    }
+
+    suspend fun addWorkoutExerciseSimple(workoutId: Int, exerciseId: Int) {
+        repo.addWorkoutExerciseSimple(workoutId, exerciseId)
+    }
 }
