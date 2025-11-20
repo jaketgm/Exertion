@@ -70,11 +70,21 @@ abstract class ExertionDB: RoomDatabase() {
         @Volatile
         private var INSTANCE: ExertionDB? = null
 
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE user_table ADD COLUMN age INTEGER")
+                db.execSQL("ALTER TABLE user_table ADD COLUMN weight_kg REAL")
+                db.execSQL("ALTER TABLE user_table ADD COLUMN height_cm REAL")
+                db.execSQL("ALTER TABLE user_table ADD COLUMN gender TEXT")
+                db.execSQL("ALTER TABLE workout ADD COLUMN day_of_week INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+
         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
 
                 // --------------------------------------------------
-                // 1. WORKOUT (add day_of_week)
+                // 1. WORKOUT (fix defaults for kind & day_of_week)
                 // --------------------------------------------------
                 db.execSQL("""
             CREATE TABLE workout_new (
@@ -83,22 +93,23 @@ abstract class ExertionDB: RoomDatabase() {
                 name TEXT,
                 started_at INTEGER NOT NULL,
                 ended_at INTEGER,
-                kind TEXT NOT NULL,
+                kind TEXT NOT NULL DEFAULT 'session',
                 mesocycle_name TEXT,
                 mesocycle_week INTEGER,
                 notes TEXT,
-                day_of_week INTEGER NOT NULL DEFAULT 1,
+                day_of_week INTEGER NOT NULL,
                 FOREIGN KEY(user_id) REFERENCES user_table(user_id) ON DELETE CASCADE
             )
         """.trimIndent())
 
+                // Copy existing data, preserving whatever day_of_week is there
                 db.execSQL("""
             INSERT INTO workout_new (
                 workout_id, user_id, name, started_at, ended_at, kind,
                 mesocycle_name, mesocycle_week, notes, day_of_week
             )
             SELECT workout_id, user_id, name, started_at, ended_at, kind,
-                   mesocycle_name, mesocycle_week, notes, 1
+                   mesocycle_name, mesocycle_week, notes, day_of_week
             FROM workout
         """.trimIndent())
 
@@ -112,7 +123,7 @@ abstract class ExertionDB: RoomDatabase() {
 
 
                 // --------------------------------------------------
-                // 2. WORKOUT_EXERCISE (major changes: new FKs + indexes)
+                // 2. WORKOUT_EXERCISE
                 // --------------------------------------------------
                 db.execSQL("""
             CREATE TABLE workout_exercise_new (
@@ -158,7 +169,7 @@ abstract class ExertionDB: RoomDatabase() {
 
 
                 // --------------------------------------------------
-                // 3. SET_ENTRY (massively changed — must rebuild)
+                // 3. SET_ENTRY
                 // --------------------------------------------------
                 db.execSQL("""
             CREATE TABLE set_entry_new (
@@ -220,10 +231,8 @@ abstract class ExertionDB: RoomDatabase() {
         }
 
         fun getDatabase(context: Context): ExertionDB {
-            val temp_instance = INSTANCE
-            if (temp_instance != null) {
-                return temp_instance
-            }
+            val tmp = INSTANCE
+            if (tmp != null) return tmp
 
             synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -231,10 +240,8 @@ abstract class ExertionDB: RoomDatabase() {
                     ExertionDB::class.java,
                     "exertion_database"
                 )
-                    .fallbackToDestructiveMigration(true)
-                    .addMigrations(MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
-
                 INSTANCE = instance
                 return instance
             }
