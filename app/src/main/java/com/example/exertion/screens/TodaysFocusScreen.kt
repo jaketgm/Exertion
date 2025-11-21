@@ -45,11 +45,6 @@ import kotlinx.coroutines.launch
 import com.example.exertion.data.ec.UISetRow
 import com.example.exertion.data.ec.UIExerciseBlock
 
-
-// --------------------------------------------------------
-// HELPERS
-// --------------------------------------------------------
-
 fun estimateOneRm(weight: Double?, reps: Int): Double? {
     if (weight == null || reps <= 1) return weight
     return weight * (1 + reps / 30.0)
@@ -83,11 +78,6 @@ private fun convertToUI(exercises: List<WorkoutExerciseWithSets>): List<UIExerci
     }
 }
 
-
-// --------------------------------------------------------
-// MAIN SCREEN
-// --------------------------------------------------------
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TodaysFocusScreen(
@@ -110,12 +100,10 @@ fun TodaysFocusScreen(
         }
     }
 
-    // RAW DB RESULT
     val rawExercises by workoutExerciseVM
         .observeExercisesWithSets(todayWorkoutId)
         .collectAsState(initial = emptyList())
 
-    // UI-MAPPED DATA
     val uiExercises = remember(rawExercises) { convertToUI(rawExercises) }
 
     Column(
@@ -136,9 +124,6 @@ fun TodaysFocusScreen(
 
         Spacer(Modifier.height(14.dp))
 
-        // ---------------------------
-        // EXERCISE LIST
-        // ---------------------------
         uiExercises.forEachIndexed { index, ex ->
 
             ExerciseCard(
