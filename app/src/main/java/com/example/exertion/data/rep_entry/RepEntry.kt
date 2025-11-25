@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.*
 import com.example.exertion.data.set_entry.SetEntry
+import java.time.Instant
 
 @Entity(
     tableName = "rep_entry",
@@ -52,5 +53,5 @@ data class RepEntry(
     val successful: Boolean = true,
 
     @ColumnInfo(name = "timestamp")
-    val timestamp: Long,
+    val timestamp: Instant,
 )

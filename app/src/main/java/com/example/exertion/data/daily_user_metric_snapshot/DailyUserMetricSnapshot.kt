@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.exertion.data.user_table.UserTable
+import java.time.Instant
 
 @Entity(
     tableName = "daily_user_metric_snapshot",
@@ -34,7 +35,7 @@ data class DailyUserMetricSnapshot(
     val date_utc: Int,
 
     @ColumnInfo(name = "total_volume_kg", defaultValue = "0.0")
-    val total_volume_kg: Double = 0.0,
+    val total_volume_kg: Int = 0,
 
     @ColumnInfo(name = "total_sets", defaultValue = "0")
     val total_sets: Int = 0,
@@ -57,7 +58,6 @@ data class DailyUserMetricSnapshot(
     @ColumnInfo(name = "is_stale", defaultValue = "0")
     val is_stale: Boolean = false,
 
-    // last computation time (epoch millis)
     @ColumnInfo(name = "computed_at")
-    val computed_at: Long
+    val computed_at: Instant
 )

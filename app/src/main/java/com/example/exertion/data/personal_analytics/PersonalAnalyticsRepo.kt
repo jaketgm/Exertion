@@ -1,6 +1,5 @@
 package com.example.exertion.data.personal_analytics
 
-import androidx.lifecycle.LiveData
 import com.example.exertion.data.personal_analytics.read_dao.PersonalAnalyticsReadDao
 import com.example.exertion.data.personal_analytics.write_dao.PersonalAnalyticsWriteDao
 import kotlinx.coroutines.flow.Flow

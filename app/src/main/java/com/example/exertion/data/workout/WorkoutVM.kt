@@ -5,9 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import com.example.exertion.data.ExertionDB
-import com.example.exertion.data.db.relations.WorkoutWithExercises
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
 
 class WorkoutVM(application: Application): AndroidViewModel(application) {
     private val read_all_workout_data: Flow<List<Workout>>
@@ -25,6 +23,7 @@ class WorkoutVM(application: Application): AndroidViewModel(application) {
         workout_repository.addWorkout(workout)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getOrCreateWorkoutForToday(userId: Int): Int {
         return workout_repository.getOrCreateWorkoutForToday(userId)
     }

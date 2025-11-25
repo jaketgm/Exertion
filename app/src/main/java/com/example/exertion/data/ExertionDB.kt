@@ -1,11 +1,12 @@
 package com.example.exertion.data
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.exertion.data.daily_user_metric_snapshot.DailyUserMetricSnapshot
 import com.example.exertion.data.daily_user_metric_snapshot.read_dao.DailyUserMetricSnapshotReadDao
@@ -37,6 +38,10 @@ import com.example.exertion.data.workout_exercise.write_dao.WorkoutExerciseWrite
 import com.example.exertion.data.workout_metric_snapshot.WorkoutMetricSnapshot
 import com.example.exertion.data.workout_metric_snapshot.read_dao.WorkoutMetricSnapshotReadDao
 import com.example.exertion.data.workout_metric_snapshot.write_dao.WorkoutMetricSnapshotWriteDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import com.example.exertion.data.seed.SeedData
 
 @Database(
     entities = [
@@ -96,40 +101,51 @@ abstract class ExertionDB : RoomDatabase() {
                     .fallbackToDestructiveMigration(true)
                     .addCallback(object : RoomDatabase.Callback() {
 
+                        @RequiresApi(Build.VERSION_CODES.O)
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
-                            seedExerciseTable(db)
-                        }
 
-                        private fun seedExerciseTable(db: SupportSQLiteDatabase) {
-                            // Your entity is tableName = "exercise"
-                            // Columns:
-                            // exercise_id (PK, NOT NULL, AUTOINCR)
-                            // name (TEXT NOT NULL)
-                            // muscle_group (TEXT NOT NULL)
-                            // equipment (TEXT, NULL)
-                            // is_unilateral (INTEGER NOT NULL DEFAULT 0)
-                            // is_custom (INTEGER NOT NULL DEFAULT 0)
-                            // user_id (INTEGER, NULL, FK → user_table.user_id, but NULL is allowed)
-                            // notes (TEXT, NULL)
+                            CoroutineScope(Dispatchers.IO).launch {
 
-                            db.execSQL(
-                                """
-                                INSERT INTO exercise (
-                                    exercise_id,
-                                    name,
-                                    muscle_group,
-                                    equipment,
-                                    is_unilateral,
-                                    is_custom,
-                                    user_id,
-                                    notes
-                                ) VALUES
-                                (1, 'Bench Press', 'Chest', 'Barbell', 0, 0, NULL, NULL),
-                                (2, 'Squat', 'Quads', 'Barbell', 0, 0, NULL, NULL),
-                                (3, 'Deadlift', 'Hamstrings', 'Barbell', 0, 0, NULL, NULL)
-                                """.trimIndent()
-                            )
+                                val instance = INSTANCE ?: return@launch
+
+                                val userDao = instance.userWriteDao()
+                                val exerciseDao = instance.exerciseWriteDao()
+                                val workoutDao = instance.workoutWriteDao()
+                                val workoutExerciseDao = instance.workoutExerciseWriteDao()
+                                val setDao = instance.setEntryWriteDao()
+                                val repDao = instance.repEntryWriteDao()
+                                val dailyDao = instance.dailyUserMetricSnapshotWriteDao()
+                                val exerciseSnapshotDao = instance.exerciseMetricSnapshotWriteDao()
+                                val personalDao = instance.personalAnalyticsWriteDao()
+
+                                val user = SeedData.user
+                                val exercises = SeedData.exercises
+                                val workout1 = SeedData.workout1
+                                val workoutExercises = SeedData.workoutExercises
+                                val sets = SeedData.sets
+                                val reps = SeedData.reps
+                                val daily = SeedData.daily
+                                val exerciseSnapshots = SeedData.exerciseSnapshots
+                                val analytics = SeedData.analytics
+
+                                userDao.upsertUser(user)
+
+                                exerciseDao.insertExercises(exercises)
+
+                                workoutDao.addWorkout(workout1)
+
+                                workoutExerciseDao.addWorkoutExercise(workoutExercises)
+
+                                setDao.addSetEntries(sets)
+                                repDao.addRepEntry(reps)
+
+                                dailyDao.addDailyUserMetricSnapshot(daily)
+
+                                exerciseSnapshotDao.addExerciseMetricSnapshot(exerciseSnapshots)
+
+                                personalDao.addPersonalAnalytics(analytics)
+                            }
                         }
                     })
                     .build()

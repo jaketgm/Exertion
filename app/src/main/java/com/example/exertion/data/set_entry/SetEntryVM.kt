@@ -1,6 +1,8 @@
 package com.example.exertion.data.set_entry
 
 import android.app.Application
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import com.example.exertion.data.ExertionDB
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +31,7 @@ class SetEntryVM(application: Application): AndroidViewModel(application) {
         set_entry_repository.deleteSet(id)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun addSetForWorkoutExercise(workoutExerciseId: Int) =
         set_entry_repository.addSetForWorkoutExercise(workoutExerciseId)
 }

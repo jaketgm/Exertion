@@ -8,5 +8,5 @@ import com.example.exertion.data.exercise_metric_snapshot.ExerciseMetricSnapshot
 @Dao
 interface ExerciseMetricSnapshotWriteDao {
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
-    suspend fun addExerciseMetricSnapshot(exerciseMetricSnapshot: ExerciseMetricSnapshot)
+    suspend fun addExerciseMetricSnapshot(exerciseMetricSnapshot: List<ExerciseMetricSnapshot>)
 }

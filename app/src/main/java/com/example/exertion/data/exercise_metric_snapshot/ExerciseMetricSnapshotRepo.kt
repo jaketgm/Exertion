@@ -10,7 +10,7 @@ class ExerciseMetricSnapshotRepo(
 ) {
     fun readAllExerciseMetricSnapshotData(): Flow<List<ExerciseMetricSnapshot>> = exerciseMetricSnapshotReadDao.readAllExerciseMetricSnapshotData()
 
-    suspend fun addExerciseMetricSnapshot(exerciseMetricSnapshot: ExerciseMetricSnapshot) {
-        exerciseMetricSnapshotWriteDao.addExerciseMetricSnapshot(exerciseMetricSnapshot)
+    suspend fun addExerciseMetricSnapshot(snapshot: ExerciseMetricSnapshot) {
+        exerciseMetricSnapshotWriteDao.addExerciseMetricSnapshot(listOf(snapshot))
     }
 }

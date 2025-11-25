@@ -2,8 +2,6 @@ package com.example.exertion.data.workout
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.LiveData
-import com.example.exertion.data.db.relations.WorkoutWithExercises
 import com.example.exertion.data.workout.read_dao.WorkoutReadDao
 import com.example.exertion.data.workout.write_dao.WorkoutWriteDao
 import kotlinx.coroutines.flow.Flow

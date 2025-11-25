@@ -8,8 +8,8 @@ import com.example.exertion.data.set_entry.SetEntry
 
 @Dao
 interface SetEntryWriteDao {
-    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
-    suspend fun addSetEntry(setEntry: SetEntry): Long
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun addSetEntries(setEntries: List<SetEntry>): List<Long>
 
     @Query("DELETE FROM set_entry WHERE set_id = :id")
     suspend fun deleteSetById(id: Int)

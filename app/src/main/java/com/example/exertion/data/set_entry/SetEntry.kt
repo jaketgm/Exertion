@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.*
 import com.example.exertion.data.workout_exercise.WorkoutExercise
+import java.time.Instant
 
 @Entity(
     tableName = "set_entry",
@@ -60,7 +61,7 @@ data class SetEntry(
     val is_failure: Boolean = false,
 
     @ColumnInfo(name = "timestamp")
-    val timestamp: Long,
+    val timestamp: Instant,
 
     @ColumnInfo(name = "top", defaultValue = "0.0")
     val top: Double = 0.0,

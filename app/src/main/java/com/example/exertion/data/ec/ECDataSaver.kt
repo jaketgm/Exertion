@@ -1,16 +1,20 @@
 package com.example.exertion.data.ec
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.exertion.data.set_entry.SetEntryVM
 import com.example.exertion.data.rep_entry.RepEntryVM
 import com.example.exertion.data.set_entry.SetEntry
 import com.example.exertion.data.rep_entry.RepEntry
+import java.time.Instant
 
+@RequiresApi(Build.VERSION_CODES.O)
 suspend fun saveECSetToDB(
     setVM: SetEntryVM,
     repVM: RepEntryVM,
     data: ECSetData
 ): Int {
-    val timestamp = System.currentTimeMillis()
+    val timestamp = Instant.now()
 
     val setEntry = SetEntry(
         set_id = 0,

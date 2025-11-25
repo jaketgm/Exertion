@@ -10,7 +10,7 @@ import com.example.exertion.data.workout_exercise.WorkoutExercise
 interface WorkoutExerciseWriteDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addWorkoutExercise(workoutExercise: WorkoutExercise)
+    suspend fun addWorkoutExercise(items: List<WorkoutExercise>): List<Long>
 
     @Query("""
         UPDATE workout_exercise

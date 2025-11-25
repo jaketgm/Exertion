@@ -1,6 +1,5 @@
 package com.example.exertion.data.daily_user_metric_snapshot
 
-import androidx.lifecycle.LiveData
 import com.example.exertion.data.daily_user_metric_snapshot.read_dao.DailyUserMetricSnapshotReadDao
 import com.example.exertion.data.daily_user_metric_snapshot.write_dao.DailyUserMetricSnapshotWriteDao
 import kotlinx.coroutines.flow.Flow

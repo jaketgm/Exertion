@@ -7,6 +7,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.exertion.data.exercise.ExerciseTable
 import com.example.exertion.data.user_table.UserTable
+import java.time.Instant
 
 @Entity(
     tableName = "exercise_metric_snapshot",
@@ -65,5 +66,5 @@ data class ExerciseMetricSnapshot(
     val is_stale: Boolean = false,
 
     @ColumnInfo(name = "computed_at")
-    val computed_at: Long // epoch millis, last computation time
+    val computed_at: Instant // epoch millis, last computation time
 )

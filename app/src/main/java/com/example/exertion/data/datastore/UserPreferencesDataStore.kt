@@ -15,20 +15,17 @@ class UserPreferencesDataStore(private val context: Context) {
         private val USER_ID = intPreferencesKey("logged_in_user_id")
     }
 
-    // Flow that emits user ID or null
     val userIdFlow: Flow<Int?> = context.dataStore.data
         .map { prefs ->
             prefs[USER_ID]
         }
 
-    // Save the logged-in user ID
     suspend fun setLoggedInUserId(userId: Int) {
         context.dataStore.edit { prefs ->
             prefs[USER_ID] = userId
         }
     }
 
-    // Clear user ID for logout
     suspend fun clearLoggedInUser() {
         context.dataStore.edit { prefs ->
             prefs.remove(USER_ID)

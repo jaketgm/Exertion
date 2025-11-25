@@ -7,6 +7,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.exertion.data.Gender
 import com.example.exertion.data.user_table.UserTable
+import java.time.Instant
 
 @Entity(
     tableName = "personal_analytics",
@@ -31,7 +32,7 @@ data class PersonalAnalytics(
     val user_id: Int,
 
     @ColumnInfo(name = "measured_at")
-    val measured_at: Long,
+    val measured_at: Instant,
 
     @ColumnInfo(name = "weight_kg")
     val weight_kg: Double?, // nullable; however, if null => DOTS will be null, since it needs user bodyweight
@@ -49,5 +50,5 @@ data class PersonalAnalytics(
     val age: Int?, // nullable + need to restrict s.t. > 0
 
     @ColumnInfo(name = "gender")
-    val gender: Gender?, // nullable + TODO: implement converter in DAO
+    val gender: Gender?,
 )

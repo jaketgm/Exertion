@@ -8,5 +8,5 @@ import com.example.exertion.data.rep_entry.RepEntry
 @Dao
 interface RepEntryWriteDao {
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
-    suspend fun addRepEntry(repEntry: RepEntry)
+    suspend fun addRepEntry(repEntry: List<RepEntry>)
 }

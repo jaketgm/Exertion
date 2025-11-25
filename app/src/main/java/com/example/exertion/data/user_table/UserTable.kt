@@ -29,9 +29,6 @@ data class UserTable(
     @ColumnInfo(name = "created_at")
     val created_at: Long,
 
-    // ------------------------
-    // NEW SETTINGS FIELDS
-    // ------------------------
     @ColumnInfo(name = "age")
     val age: Int? = null,
 
