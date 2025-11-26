@@ -22,14 +22,11 @@ interface UserReadDao {
     )
     suspend fun getUserByEmail(email: String): UserTable?
 
-    // 2 Options for login, one can be through email and the other is username + password (do this elsewhere)
-
     @Query(
         "SELECT * FROM user_table WHERE username = :username LIMIT 1"
     )
     suspend fun getUserByUsername(username: String): UserTable?
 
-    // List of users in ascending order by id
     @Query(
         "SELECT * FROM user_table ORDER BY user_id ASC"
     )

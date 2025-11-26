@@ -97,7 +97,6 @@ abstract class ExertionDB : RoomDatabase() {
                     ExertionDB::class.java,
                     "exertion_database"
                 )
-                    // Fine while you’re iterating on the schema
                     .fallbackToDestructiveMigration(true)
                     .addCallback(object : RoomDatabase.Callback() {
 

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import com.example.exertion.data.db.relations.WorkoutExerciseWithSets
+import com.example.exertion.data.ec.WorkoutExerciseFull
 import com.example.exertion.data.workout_exercise.WorkoutExercise
 import kotlinx.coroutines.flow.Flow
 
@@ -24,4 +25,8 @@ interface WorkoutExerciseReadDao {
     fun observeExercisesWithSets(
         workoutId: Int
     ): Flow<List<WorkoutExerciseWithSets>>
+
+    @Transaction
+    @Query("SELECT * FROM workout_exercise WHERE workout_id = :workoutId ORDER BY exercise_order ASC")
+    fun observeExercisesFull(workoutId: Int?): Flow<List<WorkoutExerciseFull>>
 }

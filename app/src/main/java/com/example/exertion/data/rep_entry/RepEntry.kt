@@ -19,7 +19,7 @@ import java.time.Instant
         )
     ],
     indices = [
-        Index(value = ["set_id", "rep_index"], unique = true), // 1-based order within set, unique per (set, index)
+        Index(value = ["set_id", "rep_index"], unique = true), // unique per (set, index)
         Index(value = ["set_id"])
     ]
 )

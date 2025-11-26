@@ -46,10 +46,10 @@ data class SetEntry(
     val tut_ms: Double?,
 
     @ColumnInfo(name = "rir")
-    val rir: Double?, // Allowed range ~ [-5..10]
+    val rir: Double?, // Allowed range [-5..10]
 
     @ColumnInfo(name = "rpe")
-    val rpe: Double?, // Allowed range ~ [1..10]
+    val rpe: Double?, // Allowed range [1..10]
 
     @ColumnInfo(name = "rest_sec")
     val rest_sec: Int?,

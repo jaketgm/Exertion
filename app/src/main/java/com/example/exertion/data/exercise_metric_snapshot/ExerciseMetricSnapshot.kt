@@ -45,7 +45,7 @@ data class ExerciseMetricSnapshot(
     val exercise_id: Int,
 
     @ColumnInfo(name = "period_start")
-    val period_start: Long, // epoch millis (e.g., week start)
+    val period_start: Long,
 
     @ColumnInfo(name = "period_end")
     val period_end: Long,
@@ -66,5 +66,5 @@ data class ExerciseMetricSnapshot(
     val is_stale: Boolean = false,
 
     @ColumnInfo(name = "computed_at")
-    val computed_at: Instant // epoch millis, last computation time
+    val computed_at: Instant // last computation time
 )

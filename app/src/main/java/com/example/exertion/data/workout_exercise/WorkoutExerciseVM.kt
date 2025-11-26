@@ -4,14 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.example.exertion.data.ExertionDB
 import com.example.exertion.data.db.relations.WorkoutExerciseWithSets
+import com.example.exertion.data.ec.WorkoutExerciseFull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class WorkoutExerciseVM(application: Application) : AndroidViewModel(application) {
-
     private val repo: WorkoutExerciseRepo
 
-    // optional: expose full list of all
     val allWorkoutExercises: Flow<List<WorkoutExercise>>
 
     init {
@@ -39,6 +38,10 @@ class WorkoutExerciseVM(application: Application) : AndroidViewModel(application
 
     suspend fun addExerciseToWorkout(workoutId: Int, exerciseId: Int) {
         repo.addWorkoutExerciseSimple(workoutId, exerciseId)
+    }
+
+    fun observeExercisesFull(workoutId: Int?): Flow<List<WorkoutExerciseFull>> {
+        return repo.observeExercisesFull(workoutId)
     }
 
     suspend fun addWorkoutExerciseSimple(workoutId: Int, exerciseId: Int) {

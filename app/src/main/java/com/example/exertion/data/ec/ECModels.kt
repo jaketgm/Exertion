@@ -1,5 +1,11 @@
 package com.example.exertion.data.ec
 
+import androidx.room.Embedded
+import androidx.room.Relation
+import com.example.exertion.data.exercise.ExerciseTable
+import com.example.exertion.data.set_entry.SetEntry
+import com.example.exertion.data.workout_exercise.WorkoutExercise
+
 data class ECRepData(
     val repIndex: Int,
     val eccentricMs: Double,
@@ -26,8 +32,8 @@ enum class ECPhase {
 
 data class ECFrameMetrics(
     val timestampMs: Long,
-    val romFraction: Float, // 0f..1f (0 = bottom, 1 = top) normalized from box center
-    val velocity: Float, // change in romFraction / second (signed)
+    val romFraction: Float, // (0 = bottom, 1 = top), I think this works
+    val velocity: Float, // change in romFraction / second
     val phase: ECPhase
 )
 
@@ -45,4 +51,18 @@ data class UISetRow(
     val weight: Double,
     val restSeconds: Int?,
     val oneRmPercent: Int?
+)
+
+data class WorkoutExerciseFull(
+    @Embedded val workoutExercise: WorkoutExercise,
+    @Relation(
+        parentColumn = "exercise_id",
+        entityColumn = "exercise_id"
+    )
+    val exercise: ExerciseTable,
+    @Relation(
+        parentColumn = "workout_exercise_id",
+        entityColumn = "workout_exercise_id"
+    )
+    val sets: List<SetEntry>
 )

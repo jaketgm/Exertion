@@ -8,7 +8,6 @@ class UserRepo(
     private val userReadDao: UserReadDao,
     private val userWriteDao: UserWriteDao
 ) {
-    // READS
     fun readAllData(): Flow<List<UserTable>> = userReadDao.readAllData()
 
     fun observeUser(id: Int): Flow<UserTable?> =

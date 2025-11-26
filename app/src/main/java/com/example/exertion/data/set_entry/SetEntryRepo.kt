@@ -18,7 +18,7 @@ class SetEntryRepo(
 
     suspend fun addSetEntryReturningId(setEntry: SetEntry): Long {
         val ids = setEntryWriteDao.addSetEntries(listOf(setEntry))
-        return ids.first()   // return the generated ID
+        return ids.first() // return the generated ID
     }
 
     suspend fun addSetEntry(setEntry: SetEntry) {

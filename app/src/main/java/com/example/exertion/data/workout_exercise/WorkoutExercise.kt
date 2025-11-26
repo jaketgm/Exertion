@@ -26,10 +26,9 @@ import com.example.exertion.data.workout.Workout
         )
     ],
     indices = [
-        // Enforce one row per position in a workout (allows same exercise multiple times if orders differ)
+        // enforce one row per position in a workout (allows same exercise multiple times if orders differ)
         Index(value = ["workout_id", "exercise_order"], unique = true),
 
-        // Extra helpers per DBML
         Index(value = ["workout_id"]),
         Index(value = ["exercise_id"])
     ]

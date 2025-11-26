@@ -19,7 +19,7 @@ import com.example.exertion.data.user_table.UserTable
     ],
     indices = [
         Index(value = ["name"]),
-        Index(value = ["user_id", "name"], unique = true) // per-user unique names (case-insensitive via collate)
+        Index(value = ["user_id", "name"], unique = true) // per-user unique names
     ]
 )
 data class ExerciseTable(
@@ -31,7 +31,7 @@ data class ExerciseTable(
     val name: String,
 
     @ColumnInfo(name = "muscle_group")
-    val muscle_group: String, // maybe add hash table or enum class similar to gender
+    val muscle_group: String,
 
     @ColumnInfo(name = "equipment")
     val equipment: String?,

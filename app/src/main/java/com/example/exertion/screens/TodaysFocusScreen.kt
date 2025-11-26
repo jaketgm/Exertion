@@ -44,13 +44,15 @@ import kotlinx.coroutines.launch
 
 import com.example.exertion.data.ec.UISetRow
 import com.example.exertion.data.ec.UIExerciseBlock
+import com.example.exertion.data.ec.WorkoutExerciseFull
+import kotlinx.coroutines.flow.flowOf
 
 fun estimateOneRm(weight: Double?, reps: Int): Double? {
     if (weight == null || reps <= 1) return weight
     return weight * (1 + reps / 30.0)
 }
 
-private fun convertToUI(exercises: List<WorkoutExerciseWithSets>): List<UIExerciseBlock> {
+private fun convertToUI(exercises: List<WorkoutExerciseFull>): List<UIExerciseBlock> {
     return exercises.map { wex ->
 
         val uiSets = wex.sets.sortedBy { it.set_index }.map { set ->
@@ -72,7 +74,7 @@ private fun convertToUI(exercises: List<WorkoutExerciseWithSets>): List<UIExerci
         UIExerciseBlock(
             workoutExerciseId = wex.workoutExercise.workout_exercise_id,
             exerciseId = wex.workoutExercise.exercise_id,
-            name = "Exercise ${wex.workoutExercise.exercise_id}", // TODO join ExerciseTable
+            name = wex.exercise.name,
             sets = uiSets
         )
     }
@@ -87,22 +89,28 @@ fun TodaysFocusScreen(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
     val prefs = UserPreferencesDataStore(context)
-    val userId by prefs.userIdFlow.collectAsState(initial = null)
+    val userIdFromPrefs by prefs.userIdFlow.collectAsState(initial = null)
+
+    // fallback to seed user for now
+    val effectiveUserId = userIdFromPrefs ?: 1
 
     val workoutVM: WorkoutVM = viewModel()
 
     var todayWorkoutId by remember { mutableStateOf<Int?>(null) }
 
-    LaunchedEffect(userId) {
-        if (userId != null) {
-            todayWorkoutId = workoutVM.getOrCreateWorkoutForToday(userId!!)
-        }
+    LaunchedEffect(effectiveUserId) {
+        todayWorkoutId = workoutVM.getOrCreateWorkoutForToday(effectiveUserId)
     }
 
-    val rawExercises by workoutExerciseVM
-        .observeExercisesWithSets(todayWorkoutId)
-        .collectAsState(initial = emptyList())
+    val rawExercises by remember(todayWorkoutId) {
+        if (todayWorkoutId != null) {
+            workoutExerciseVM.observeExercisesFull(todayWorkoutId!!)
+        } else {
+            flowOf(emptyList())
+        }
+    }.collectAsState(initial = emptyList())
 
     val uiExercises = remember(rawExercises) { convertToUI(rawExercises) }
 
@@ -113,41 +121,31 @@ fun TodaysFocusScreen(
             .verticalScroll(rememberScrollState())
     ) {
         NavBar(
-            user_name = if (userId != null) "Jake" else "Guest",
+            user_name = if (userIdFromPrefs != null) "Jake" else "Guest",
             is_dark_mode = true,
             show_back_button = true,
             nav_controller = navController,
-            loggedInUserId = userId,
+            loggedInUserId = userIdFromPrefs,
             on_profile_click = { navController.navigate("login") },
-            on_settings_click = { navController.navigate("settings/$userId") }
+            on_settings_click = { navController.navigate("settings/$userIdFromPrefs") }
         )
 
         Spacer(Modifier.height(14.dp))
 
         uiExercises.forEachIndexed { index, ex ->
-
             ExerciseCard(
                 exercise = ex,
-                onMoveUp = {
-                    if (index > 0) {
-                        // TODO implement reorder logic
-                    }
-                },
-                onMoveDown = {
-                    if (index < uiExercises.lastIndex) {
-                        // TODO implement reorder logic
-                    }
-                },
+                onMoveUp = { /* TODO */ },
+                onMoveDown = { /* TODO */ },
                 onAddSet = {
                     scope.launch {
                         setEntryVM.addSetForWorkoutExercise(ex.workoutExerciseId)
                     }
                 },
-                onEvaluateEC = { setIndex ->
+                onEvaluateEC = {
                     navController.navigate("eccentric_concentric")
                 }
             )
-
             Spacer(Modifier.height(12.dp))
         }
 
@@ -169,7 +167,6 @@ fun TodaysFocusScreen(
         Spacer(Modifier.height(60.dp))
     }
 }
-
 
 @Composable
 fun AddExerciseButton(onAdd: () -> Unit) {

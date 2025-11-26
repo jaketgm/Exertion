@@ -22,12 +22,10 @@ class UserVM(application: Application) : AndroidViewModel(application) {
     fun observeUser(id: Int): Flow<UserTable?> =
         repository.observeUser(id)
 
-    // Create or update a user
     suspend fun upsertUser(user: UserTable): Int {
         return repository.upsertUser(user).toInt()
     }
 
-    // Explicit wrapper for clarity
     suspend fun updateUser(user: UserTable): Int {
         return repository.upsertUser(user).toInt()
     }

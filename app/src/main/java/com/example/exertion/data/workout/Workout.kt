@@ -50,5 +50,5 @@ data class Workout(
     val notes: String?,
 
     @ColumnInfo(name = "day_of_week")
-    val day_of_week: Int, // 1=Monday … 7=Sunday
+    val day_of_week: Int, // 1=Monday...7=Sunday
 )

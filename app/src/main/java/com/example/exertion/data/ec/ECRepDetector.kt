@@ -15,9 +15,9 @@ class ECRepDetector {
 
     private var repCounter = 0
 
-    private val lowThresh = 0.25f // ROM ~ bottom
-    private val highThresh = 0.75f // ROM ~ top
-    private val velThresh = 0.15f // romFraction / sec "significant movement"
+    private val lowThresh = 0.25f // ROM bottom
+    private val highThresh = 0.75f // ROM top
+    private val velThresh = 0.15f // "significant movement"
 
     fun onSample(sample: ECFrameMetrics): ECRepData? {
         val t = sample.timestampMs
@@ -43,19 +43,19 @@ class ECRepDetector {
             phaseStartTime = t
         }
 
-        // Detect "bottom" when we cross from above highThresh to below lowThresh
+        // detect the bottom if we cross from above highThresh to below lowThresh
         if (lastRomVal != null && lastRomVal > highThresh && rom < lowThresh) {
             lastBottomTime = t
             eccStartTime = phaseStartTime ?: (t - 200)
         }
 
-        // Detect "top" when we cross from below lowThresh to above highThresh
+        // vice versa
         if (lastRomVal != null && lastRomVal < lowThresh && rom > highThresh) {
             lastTopTime = t
             conStartTime = phaseStartTime ?: (t - 200)
         }
 
-        // consider a full rep when we have both a bottom & top in proper order
+        // full rep => both a bottom & top in proper order
         val bottom = lastBottomTime
         val top = lastTopTime
         val eccStart = eccStartTime

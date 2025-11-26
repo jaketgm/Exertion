@@ -1,6 +1,7 @@
 package com.example.exertion.data.workout_exercise
 
 import com.example.exertion.data.db.relations.WorkoutExerciseWithSets
+import com.example.exertion.data.ec.WorkoutExerciseFull
 import com.example.exertion.data.workout_exercise.read_dao.WorkoutExerciseReadDao
 import com.example.exertion.data.workout_exercise.write_dao.WorkoutExerciseWriteDao
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +24,9 @@ class WorkoutExerciseRepo(
 
     suspend fun updateExerciseOrder(id: Int, newOrder: Int) =
         writeDao.updateExerciseOrder(id, newOrder)
+
+    fun observeExercisesFull(workoutId: Int?): Flow<List<WorkoutExerciseFull>> =
+        readDao.observeExercisesFull(workoutId)
 
     suspend fun addWorkoutExerciseSimple(workoutId: Int, exerciseId: Int) {
         val current = readDao.observeExercisesWithSets(workoutId).firstOrNull() ?: emptyList()

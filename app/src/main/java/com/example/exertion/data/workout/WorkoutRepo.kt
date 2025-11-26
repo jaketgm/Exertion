@@ -19,16 +19,14 @@ class WorkoutRepo(
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getOrCreateWorkoutForToday(userId: Int): Int {
+        // if any workout already exists for this user, treat it as today's
+        val first = workoutReadDao.getFirstWorkoutForUser(userId)
+        if (first != null) return first.workout_id
+
+        // otherwise, create a new workout
         val now = System.currentTimeMillis()
+        val today = LocalDate.now().dayOfWeek.value
 
-        // 1. Check if workout already exists
-        val existing = workoutReadDao.getWorkoutForToday(
-            userId = userId,
-            todayEpoch = now
-        )
-        if (existing != null) return existing.workout_id
-
-        // 2. Create new workout
         val newWorkout = Workout(
             workout_id = 0,
             user_id = userId,
@@ -39,7 +37,7 @@ class WorkoutRepo(
             mesocycle_name = null,
             mesocycle_week = null,
             notes = null,
-            day_of_week = LocalDate.now().dayOfWeek.value // 1 = Monday … 7 = Sunday
+            day_of_week = today
         )
 
         return workoutWriteDao.addWorkout(newWorkout).toInt()

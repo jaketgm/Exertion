@@ -12,14 +12,9 @@ interface WorkoutReadDao {
     )
     fun readAllWorkoutData(): Flow<List<Workout>>
 
-    @Query("""
-        SELECT * FROM workout
-        WHERE user_id = :userId
-        AND date(started_at / 1000, 'unixepoch') = date(:todayEpoch / 1000, 'unixepoch')
-        LIMIT 1
-    """)
-    suspend fun getWorkoutForToday(
-        userId: Int,
-        todayEpoch: Long
-    ): Workout?
+    @Query("SELECT * FROM workout WHERE user_id = :userId AND day_of_week = :dayOfWeek LIMIT 1")
+    suspend fun getWorkoutByDay(userId: Int, dayOfWeek: Int): Workout?
+
+    @Query("SELECT * FROM workout WHERE user_id = :userId ORDER BY workout_id ASC LIMIT 1")
+    suspend fun getFirstWorkoutForUser(userId: Int): Workout?
 }

@@ -84,10 +84,9 @@ fun EccentricConcentricEvaluatorScreen(
 
     val scope = rememberCoroutineScope()
 
-    // Derive current set summary from live reps
     val currentSet = ECSetData(
-        workoutExerciseId = 1, // TODO: tie to chosen exercise
-        weightKg = 60.0, // TODO: pull from workout context
+        workoutExerciseId = 1,
+        weightKg = 60.0,
         setIndex = 1,
         reps = reps,
         rir = null,
@@ -188,7 +187,7 @@ fun EccentricConcentricEvaluatorScreen(
                 onSelect = { selected ->
                     detectionText = "Exercise: ${selected.name}"
                     showExerciseMenu = false
-                    // TODO: also update workoutExerciseId & weightKg if you want
+                    // TODO: also update workoutExerciseId & weightKg
                 },
                 onDismiss = { showExerciseMenu = false }
             )
