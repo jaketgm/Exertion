@@ -157,7 +157,7 @@ fun TodaysFocusScreen(
                     if (todayWorkoutId != null) {
                         workoutExerciseVM.addWorkoutExerciseSimple(
                             workoutId = todayWorkoutId!!,
-                            exerciseId = 1 // Bench Press
+                            exerciseId = 1 // bench Press
                         )
                     }
                 }
