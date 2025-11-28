@@ -49,6 +49,18 @@ object SeedData {
         gender = "male"
     )
 
+    val user2 = UserTable(
+        user_id = 2,
+        username = "alexfit",
+        email = "alexfit@email.com",
+        password_hash = "4kHt5[4|Fml_",
+        created_at = System.currentTimeMillis(),
+        age = 27,
+        weight_kg = 82.5,
+        height_cm = 178.0,
+        gender = "male"
+    )
+
     val exercises = listOf(
         ExerciseTable(1, "Barbell Bench Press", "Chest", "Barbell", false, false, 1, null),
         ExerciseTable(2, "Back Squat", "Legs", "Barbell", false, false, 1, null),
@@ -56,6 +68,14 @@ object SeedData {
         ExerciseTable(4, "Overhead Press", "Shoulders", "Barbell", false, false, 1, null),
         ExerciseTable(5, "Lat Pulldown", "Back", "Machine", false, false, 1, null),
         ExerciseTable(6, "Dumbbell Curl", "Arms", "Dumbbells", true, false, 1, null)
+    )
+
+    val exercises_for_user2 = listOf(
+        ExerciseTable(10, "Back Squat", "Legs", "Barbell", false, false, 2, null),
+        ExerciseTable(11, "Romanian Deadlift", "Hamstrings", "Barbell", false, false, 2, null),
+        ExerciseTable(12, "Leg Press", "Legs", "Machine", false, false, 2, null),
+        ExerciseTable(13, "Glute Bridge", "Glutes", "Barbell", false, false, 2, null),
+        ExerciseTable(14, "Calf Raise", "Calves", "Machine", false, false, 2, null)
     )
 
     val workout1 = Workout(
@@ -70,10 +90,29 @@ object SeedData {
         day_of_week = 1
     )
 
+    val workout_for_user2 = Workout(
+        workout_id = 2,
+        user_id = 2,
+        name = "Lower Body – Strength Session",
+        started_at = 1732492800000L,
+        ended_at = 1732496400000L,
+        mesocycle_name = "Strength Phase",
+        mesocycle_week = 1,
+        notes = "Good session, heavy squats felt solid",
+        day_of_week = 3
+    )
+
     val workoutExercises = listOf(
         WorkoutExercise(1, 1, 1, 1, 4, 6, 80.0), // Bench Press
         WorkoutExercise(2, 1, 4, 2, 3, 8, 45.0), // OHP
         WorkoutExercise(3, 1, 6, 3, 3, 12, 15.0) // Dumbbell Curl
+    )
+
+    val workout_exercises_for_user2 = listOf(
+        WorkoutExercise(10, 2, 10, 1, 5, 5, 140.0), // Back Squat
+        WorkoutExercise(11, 2, 11, 2, 4, 8, 100.0), // RDL
+        WorkoutExercise(12, 2, 12, 3, 3, 12, 300.0), // Leg Press
+        WorkoutExercise(13, 2, 14, 4, 4, 12, 60.0)   // Calf Raise
     )
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -213,10 +252,113 @@ object SeedData {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalTime::class)
+    val sets_for_user2 = listOf(
+        // Back Squat
+        SetEntry(
+            20,
+            10,
+            1,
+            "working",
+            5,
+            140.0,
+            3200.0,
+            1.5,
+            8.0,
+            240,
+            false,
+            false,
+            Instant.now(),
+            0.38,
+            0.15,
+            "2-1-1-0",
+            10.0,
+            1.0,
+            8.0,
+            0.90
+        ),
+        SetEntry(
+            21,
+            10,
+            2,
+            "working",
+            5,
+            140.0,
+            3300.0,
+            2.0,
+            8.5,
+            240,
+            false,
+            false,
+            Instant.now(),
+            0.35,
+            0.14,
+            "2-1-1-0",
+            12.0,
+            1.2,
+            8.5,
+            0.88
+        ),
+        SetEntry(
+            22,
+            11,
+            1,
+            "working",
+            8,
+            100.0,
+            3400.0,
+            3.0,
+            7.5,
+            180,
+            false,
+            false,
+            Instant.now(),
+            0.55,
+            0.22,
+            "3-0-2-0",
+            6.0,
+            0.5,
+            7.5,
+            0.92
+        ),
+        SetEntry(
+            23,
+            12,
+            1,
+            "working",
+            12,
+            300.0,
+            4500.0,
+            4.0,
+            7.0,
+            180,
+            false,
+            false,
+            Instant.now(),
+            0.70,
+            0.25,
+            "1-0-2-0",
+            5.0,
+            0.5,
+            7.0,
+            0.90
+        )
+    )
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @OptIn(ExperimentalTime::class)
     val reps = listOf(
         RepEntry(1, 1, 1, 900.0, 1400.0, 2300.0, 0.35, 85.0, true, Instant.now()),
         RepEntry(2, 1, 2, 950.0, 1350.0, 2300.0, 0.33, 84.0, true, Instant.now()),
         RepEntry(3, 1, 3, 1000.0, 1300.0, 2300.0, 0.31, 83.0, true, Instant.now())
+    )
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @OptIn(ExperimentalTime::class)
+    val reps_for_user2 = listOf(
+        // Squat set 1
+        RepEntry(20, 20, 1, 850.0, 1400.0, 2250.0, 0.33, 90.0, true, Instant.now()),
+        RepEntry(21, 20, 2, 900.0, 1350.0, 2250.0, 0.32, 92.0, true, Instant.now()),
+        RepEntry(22, 20, 3, 950.0, 1300.0, 2250.0, 0.30, 89.0, true, Instant.now())
     )
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -231,6 +373,21 @@ object SeedData {
         avg_velocity_mps = 0.35,
         est_1rm_best_kg = 100.0,
         dots = 320.0,
+        computed_at = Instant.now()
+    )
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @OptIn(ExperimentalTime::class)
+    val daily_for_user2 = DailyUserMetricSnapshot(
+        user_id = 2,
+        date_utc = 20241125, // day after user 1 session
+        total_volume_kg = 140*5 + 140*5 + 100*8 + 300*12,
+        total_sets = 4,
+        total_reps = 5 + 5 + 8 + 12,
+        total_tut_ms = 3200.0 + 3300.0 + 3400.0 + 4500.0,
+        avg_velocity_mps = 0.40,
+        est_1rm_best_kg = 175.0,
+        dots = 395.0,
         computed_at = Instant.now()
     )
 
@@ -252,6 +409,22 @@ object SeedData {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalTime::class)
+    val exercise_snapshots_for_user2 = listOf(
+        ExerciseMetricSnapshot(
+            user_id = 2,
+            exercise_id = 10,
+            period_start = weekStart(),
+            period_end = weekEnd(),
+            total_volume_kg = 140.0 * 10,
+            top_est_1rm_kg = 175.0,
+            avg_tut_ms = 3250.0,
+            sessions = 1,
+            computed_at = Instant.now()
+        )
+    )
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @OptIn(ExperimentalTime::class)
     val analytics = PersonalAnalytics(
         user_id = 1,
         measured_at = Instant.now(),
@@ -260,6 +433,19 @@ object SeedData {
         bodyfat_pct = 10.0,
         maintenance_calorie = 2800.0,
         age = 20,
+        gender = Gender.MALE
+    )
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @OptIn(ExperimentalTime::class)
+    val analytics_for_user2 = PersonalAnalytics(
+        user_id = 2,
+        measured_at = Instant.now(),
+        weight_kg = 82.5,
+        height_cm = 178.0,
+        bodyfat_pct = 14.0,
+        maintenance_calorie = 2900.0,
+        age = 27,
         gender = Gender.MALE
     )
 }

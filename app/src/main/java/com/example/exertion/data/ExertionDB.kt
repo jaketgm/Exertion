@@ -119,31 +119,58 @@ abstract class ExertionDB : RoomDatabase() {
                                 val personalDao = instance.personalAnalyticsWriteDao()
 
                                 val user = SeedData.user
+                                val user2 = SeedData.user2
+
                                 val exercises = SeedData.exercises
+                                val exercises_for_user2 = SeedData.exercises_for_user2
+
                                 val workout1 = SeedData.workout1
+                                val workout_for_user2 = SeedData.workout_for_user2
+
                                 val workoutExercises = SeedData.workoutExercises
+                                val workout_exercises_for_user2 = SeedData.workout_exercises_for_user2
+
                                 val sets = SeedData.sets
+                                val sets_for_user2 = SeedData.sets_for_user2
+
                                 val reps = SeedData.reps
+                                val reps_for_user2 = SeedData.reps_for_user2
+
                                 val daily = SeedData.daily
+                                val daily_for_user2 = SeedData.daily_for_user2
+
                                 val exerciseSnapshots = SeedData.exerciseSnapshots
+                                val exercise_snapshots_for_user2 = SeedData.exercise_snapshots_for_user2
+
                                 val analytics = SeedData.analytics
+                                val analytics_for_user2 = SeedData.analytics_for_user2
 
                                 userDao.upsertUser(user)
+                                userDao.upsertUser(user2)
 
                                 exerciseDao.insertExercises(exercises)
+                                exerciseDao.insertExercises(exercises_for_user2)
 
                                 workoutDao.addWorkout(workout1)
+                                workoutDao.addWorkout(workout_for_user2)
 
                                 workoutExerciseDao.addWorkoutExercise(workoutExercises)
+                                workoutExerciseDao.addWorkoutExercise(workout_exercises_for_user2)
 
                                 setDao.addSetEntries(sets)
+                                setDao.addSetEntries(sets_for_user2)
+
                                 repDao.addRepEntry(reps)
+                                repDao.addRepEntry(reps_for_user2)
 
                                 dailyDao.addDailyUserMetricSnapshot(daily)
+                                dailyDao.addDailyUserMetricSnapshot(daily_for_user2)
 
                                 exerciseSnapshotDao.addExerciseMetricSnapshot(exerciseSnapshots)
+                                exerciseSnapshotDao.addExerciseMetricSnapshot(exercise_snapshots_for_user2)
 
                                 personalDao.addPersonalAnalytics(analytics)
+                                personalDao.addPersonalAnalytics(analytics_for_user2)
                             }
                         }
                     })
