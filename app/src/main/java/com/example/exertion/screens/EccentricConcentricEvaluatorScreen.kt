@@ -1,6 +1,11 @@
 package com.example.exertion.screens
 
+import android.content.Context
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.os.Build
+import android.util.Log
+import android.widget.VideoView
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,9 +29,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,11 +52,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.exertion.R
 import com.example.exertion.data.datastore.UserPreferencesDataStore
+import com.example.exertion.data.ec.ECFrameMetrics
 import com.example.exertion.data.ec.ECRepData
 import com.example.exertion.data.ec.ECRepDetector
 import com.example.exertion.data.ec.ECSetData
@@ -61,7 +70,11 @@ import com.example.exertion.data.set_entry.SetEntryVM
 import com.example.exertion.ui_components.buttons.EccentricConcentricButton
 import com.example.exertion.ui_components.navbar.NavBar
 import com.example.exertion.utils.camera.InlineCameraPreview
+import com.example.exertion.utils.camera.ObjectRecognitionAnalyzer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -71,12 +84,23 @@ fun EccentricConcentricEvaluatorScreen(
 ) {
     var isDetecting by remember { mutableStateOf(false) }
     var detectionText by remember { mutableStateOf("Exercise: $exerciseName") }
+    var useStaticAnalysis by remember { mutableStateOf(false) }
 
     val setVM: SetEntryVM = viewModel()
     val repVM: RepEntryVM = viewModel()
     val exerciseVM: ExerciseVM = viewModel()
     val exercises by exerciseVM.allExercises.collectAsState(initial = emptyList())
     var showExerciseMenu by remember { mutableStateOf(false) }
+
+    val staticVideos = listOf(
+        "Bench Press" to R.raw.bench,
+        "Squat" to R.raw.back_squat,
+        "Chin Ups" to R.raw.chin_ups,
+        "Overhead Press" to R.raw.overhead_press,
+        "Tricep Extensions" to R.raw.tricep_extensions
+    )
+
+    var selectedStaticVideoRes by remember { mutableStateOf(R.raw.bench) }
 
     // live rep tracking
     var reps by remember { mutableStateOf(emptyList<ECRepData>()) }
@@ -128,18 +152,26 @@ fun EccentricConcentricEvaluatorScreen(
                 .background(Color(0xFF000000))
         ) {
             if (isDetecting) {
-                InlineCameraPreview(
-                    modifier = Modifier.matchParentSize(),
-                    onLabelUpdated = { label ->
-                        detectionText = label
-                    },
-                    onFrameMetrics = { metrics ->
-                        val newRep = repDetector.onSample(metrics)
-                        if (newRep != null) {
-                            reps = reps + newRep
+                if (useStaticAnalysis) {
+                    ECStaticVideoInlinePlayer(
+                        modifier = Modifier.matchParentSize(),
+                        videoResId = selectedStaticVideoRes,
+                        onLabelUpdated = { detectionText = it },
+                        onFrameMetrics = { metrics ->
+                            val rep = repDetector.onSample(metrics)
+                            if (rep != null) reps = reps + rep
                         }
-                    }
-                )
+                    )
+                } else {
+                    InlineCameraPreview(
+                        modifier = Modifier.matchParentSize(),
+                        onLabelUpdated = { detectionText = it },
+                        onFrameMetrics = { metrics ->
+                            val rep = repDetector.onSample(metrics)
+                            if (rep != null) reps = reps + rep
+                        }
+                    )
+                }
             }
 
             Text(
@@ -158,6 +190,11 @@ fun EccentricConcentricEvaluatorScreen(
                     onClick = {
                         isDetecting = true
                         detectionText = "Detecting..."
+
+                        useStaticAnalysis = true
+
+                        // For dynamic camera, comment out static and switch this to false:
+                        // useStaticAnalysis = false
                     },
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -180,6 +217,39 @@ fun EccentricConcentricEvaluatorScreen(
                 showExerciseMenu = true
             }
         )
+
+        if (showExerciseMenu) {
+            if (useStaticAnalysis) {
+                StaticVideoDropdownMenu(
+                    videos = staticVideos,
+                    onSelect = { pair ->
+                        detectionText = "Exercise: ${pair.first}"
+                        selectedStaticVideoRes = pair.second
+
+                        isDetecting = false
+                        reps = emptyList()
+
+                        showExerciseMenu = false
+                    },
+                    onDismiss = { showExerciseMenu = false }
+                )
+            } else {
+                ExerciseDropdownMenu(
+                    exercises = exercises,
+                    onSelect = { selected ->
+                        detectionText = "Exercise: ${selected.name}"
+                        showExerciseMenu = false
+                    },
+                    onDismiss = { showExerciseMenu = false }
+                )
+            }
+        }
+
+        LaunchedEffect(selectedStaticVideoRes) {
+            if (useStaticAnalysis && isDetecting) {
+                isDetecting = true
+            }
+        }
 
         if (showExerciseMenu) {
             ExerciseDropdownMenu(
@@ -649,3 +719,251 @@ fun PreviewEccentricConcentricEvaluatorScreen() {
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun ECStaticVideoTestScreen() {
+    val context = LocalContext.current
+
+    var isPlaying by remember { mutableStateOf(false) }
+    var detectionText by remember { mutableStateOf("Static Video Mode") }
+
+    var reps by remember { mutableStateOf(emptyList<ECRepData>()) }
+    val repDetector = remember { ECRepDetector() }
+
+    val scope = rememberCoroutineScope()
+
+    val videoUri = remember {
+        Uri.parse("android.resource://" + context.packageName + "/raw/bench")
+    }
+
+    val analyzer = remember {
+        ObjectRecognitionAnalyzer(
+            context = context,
+            onDetectedObjectUpdated = { label ->
+                detectionText = label
+            },
+            onFrameMetrics = { metrics ->
+                val rep = repDetector.onSample(metrics)
+                if (rep != null) {
+                    reps = reps + rep
+                }
+            }
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+
+        Text(
+            text = "Static EC Test",
+            color = Color.White,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(16.dp)
+        )
+
+        Text(
+            text = detectionText,
+            color = Color.White,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+        )
+
+        AndroidView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+            factory = {
+                VideoView(it).apply {
+                    setVideoURI(videoUri)
+                    setOnPreparedListener { mp ->
+                        mp.isLooping = true
+                    }
+                }
+            },
+            update = { videoView ->
+                if (isPlaying) {
+                    videoView.start()
+                }
+            }
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = {
+                isPlaying = true
+                scope.launch {
+                    runVideoAnalysis(context, analyzer, videoUri)
+                }
+            }
+        ) {
+            Text("Start Analysis")
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        if (reps.isNotEmpty()) {
+            ECStatsContainer(
+                reps = reps,
+                setSummary = ECSetData(
+                    workoutExerciseId = 1,
+                    weightKg = 60.0,
+                    setIndex = 1,
+                    reps = reps,
+                    rir = null,
+                    rpe = null
+                )
+            )
+        } else {
+            Text(
+                text = "No reps detected yet.",
+                color = Color.White.copy(alpha = 0.5f),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
+    }
+}
+
+@Composable
+fun ECStaticVideoInlinePlayer(
+    modifier: Modifier = Modifier,
+    videoResId: Int,
+    onLabelUpdated: (String) -> Unit,
+    onFrameMetrics: (ECFrameMetrics) -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val videoUri = remember(videoResId) {
+        Uri.parse("android.resource://${context.packageName}/$videoResId")
+    }
+
+    val analyzer = remember(videoResId) {
+        ObjectRecognitionAnalyzer(
+            context = context,
+            onDetectedObjectUpdated = onLabelUpdated,
+            onFrameMetrics = onFrameMetrics
+        )
+    }
+
+    val videoViewRef = remember { mutableStateOf<VideoView?>(null) }
+
+    Box(modifier = modifier.background(Color.Black)) {
+
+        AndroidView(
+            modifier = Modifier.matchParentSize(),
+            factory = { ctx ->
+                VideoView(ctx).apply {
+                    videoViewRef.value = this
+                    setVideoURI(videoUri)
+                    setOnPreparedListener { mp ->
+                        mp.isLooping = true
+                        mp.start()
+                    }
+                }
+            },
+            update = { videoView ->
+                videoView.stopPlayback()
+                videoView.setVideoURI(videoUri)
+                videoView.start()
+            }
+        )
+
+        LaunchedEffect(videoResId) {
+            scope.launch {
+                runVideoAnalysis(context, analyzer, videoUri)
+            }
+        }
+    }
+}
+
+suspend fun runVideoAnalysis(
+    context: Context,
+    analyzer: ObjectRecognitionAnalyzer,
+    videoUri: Uri
+) = withContext(Dispatchers.IO) {
+
+    val retriever = MediaMetadataRetriever()
+    retriever.setDataSource(context, videoUri)
+
+    val durationMs = retriever
+        .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        ?.toLongOrNull() ?: return@withContext
+
+    var timeUs = 0L
+    val stepUs = 33_000L  // ~30 FPS
+
+    Log.d("EC-Video", "Starting static video analysis for $durationMs ms")
+
+    while (timeUs < durationMs * 1000) {
+        val frameBitmap = retriever.getFrameAtTime(
+            timeUs,
+            MediaMetadataRetriever.OPTION_CLOSEST
+        )
+
+        if (frameBitmap != null) {
+            analyzer.detectObjects(frameBitmap)
+        }
+
+        timeUs += stepUs
+        delay(5)
+    }
+
+    Log.d("EC-Video", "Finished static video analysis")
+}
+
+@Composable
+fun StaticVideoDropdownMenu(
+    videos: List<Pair<String, Int>>,
+    onSelect: (Pair<String, Int>) -> Unit,
+    onDismiss: () -> Unit
+) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.75f))
+            .clickable(onClick = { onDismiss() }, indication = null, interactionSource = remember { MutableInteractionSource() })
+    ) {
+
+        Box(
+            Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth(0.8f)
+                .height(350.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF0F0F0F))
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp)
+            ) {
+                items(videos) { pair ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFF1A1A1A))
+                            .clickable { onSelect(pair) }
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = pair.first,
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
